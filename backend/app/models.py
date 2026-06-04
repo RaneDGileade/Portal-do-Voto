@@ -1,20 +1,8 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, UniqueConstraint, Enum
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from .database import Base
-import enum
 
-# Enum tipos
-class TipoUsuario(str, enum.Enum):
-    admin = "admin"
-    eleitor = "eleitor"
-
-class StatusEleicao(str, enum.Enum):
-    rascunho = "rascunho"
-    ativa = "ativa"
-    encerrada = "encerrada"
-
-# Tabelas
 class Instituicao(Base):
     __tablename__ = "instituicoes"
 
@@ -35,7 +23,7 @@ class Usuario(Base):
     nome = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
     senha_hash = Column(String, nullable=False)
-    tipo = Column(Enum(TipoUsuario), default=TipoUsuario.eleitor)
+    tipo = Column(String, default="eleitor")
     ativo = Column(Boolean, default=True)
     instituicao_id = Column(Integer, ForeignKey("instituicoes.id"), nullable=False)
     criado_em = Column(DateTime(timezone=True), server_default=func.now())
@@ -53,7 +41,7 @@ class Eleicao(Base):
     instituicao_id = Column(Integer, ForeignKey("instituicoes.id"), nullable=False)
     inicio = Column(DateTime(timezone=True), nullable=False)
     fim = Column(DateTime(timezone=True), nullable=False)
-    status = Column(Enum(StatusEleicao), default=StatusEleicao.rascunho)
+    status = Column(String, default="rascunho")
     criado_por = Column(Integer, ForeignKey("usuarios.id"), nullable=False)
     criado_em = Column(DateTime(timezone=True), server_default=func.now())
 
