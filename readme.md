@@ -1,4 +1,4 @@
-🗳️ Portal do VotoO Portal do Voto é uma plataforma digital desenvolvida para criar, gerenciar e simular eleições de forma simples e segura. O aplicativo é ideal para ambientes escolares (grêmios, líderes de sala), acadêmicos, condomínios e simulações pedagógicas de eleições oficiais.🚀
+🗳️ O Portal do Voto é uma plataforma digital desenvolvida para criar, gerenciar e simular eleições de forma simples e segura. O aplicativo é ideal para ambientes escolares (grêmios, líderes de sala), acadêmicos, condomínios e simulações pedagógicas de eleições oficiais.🚀
 
  Funcionalidades PrincipaisCriação de Eleições: Painel simples para configurar cargos, candidatos e fotos.
  
