@@ -1,4 +1,4 @@
-<img width="1024" height="900" alt="Slogan (1)" src="https://github.com/user-attachments/assets/fb2c84fb-b50d-4e65-ba22-adb250b168f2" />
+<img width="300" height="350" alt="Slogan (1)" src="https://github.com/user-attachments/assets/fb2c84fb-b50d-4e65-ba22-adb250b168f2" />
 
 🗳️ O Portal do Voto é uma plataforma digital desenvolvida para criar, gerenciar e simular eleições de forma simples e segura. O aplicativo é ideal para ambientes escolares (grêmios, líderes de sala), acadêmicos, condomínios e simulações pedagógicas de eleições oficiais.🚀
 
