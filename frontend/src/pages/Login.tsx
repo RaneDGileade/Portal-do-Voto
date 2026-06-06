@@ -4,6 +4,7 @@ import { authService } from '../services/api'
 
 export default function Login() {
   const navigate = useNavigate()
+  const [tipo, setTipo] = useState<'admin' | 'usuario'>('usuario')
   const [form, setForm] = useState({ matricula: '', senha: '' })
   const [erro, setErro] = useState('')
   const [carregando, setCarregando] = useState(false)
@@ -21,7 +22,7 @@ export default function Login() {
       } else {
         navigate('/home')
       }
-    } catch (err: any) {
+    } catch {
       setErro('Matrícula ou senha inválidas')
     } finally {
       setCarregando(false)
@@ -33,175 +34,174 @@ export default function Login() {
       minHeight: '100vh',
       backgroundColor: '#0D1B6E',
       display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '20px'
+      flexDirection: 'column',
+      padding: '40px 30px'
     }}>
-      <div style={{
-        backgroundColor: '#0D1B6E',
-        width: '100%',
-        maxWidth: '380px',
+      <style>{`
+        .input-field {
+          width: 100%;
+          background: transparent;
+          border: none;
+          border-bottom: 1.5px solid rgba(255,255,255,0.4);
+          color: white;
+          font-size: 16px;
+          padding: 8px 0;
+          outline: none;
+          transition: border-color 0.2s;
+        }
+        .input-field:focus {
+          border-bottom-color: white;
+        }
+        .radio-label {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          color: white;
+          font-size: 16px;
+          cursor: pointer;
+        }
+      `}</style>
+
+      {/* Logo */}
+      <h1 style={{
+        fontSize: '38px',
+        fontWeight: '900',
+        color: 'white',
+        marginBottom: '50px',
+        letterSpacing: '-1px'
       }}>
-        {/* Logo */}
-        <h1 style={{
-          textAlign: 'center',
-          color: 'white',
-          fontSize: '28px',
-          fontWeight: 'bold',
-          marginBottom: '30px'
-        }}>
-          Portal Do <span style={{ color: '#FF4500' }}>Voto</span>
-        </h1>
+        Portal Do <span style={{ color: '#FF3D00' }}>Voto</span>
+      </h1>
 
-        <h2 style={{ color: 'white', fontSize: '20px', marginBottom: '20px' }}>
-          Login
-        </h2>
+      {/* Login title */}
+      <h2 style={{
+        fontSize: '32px',
+        fontWeight: '800',
+        color: 'white',
+        marginBottom: '30px'
+      }}>
+        Login
+      </h2>
 
-        {/* Tabs */}
-        <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-          <button style={{
-            flex: 1,
-            padding: '8px',
-            backgroundColor: 'transparent',
-            border: '1px solid #ccc',
-            color: '#ccc',
-            borderRadius: '4px',
-            cursor: 'pointer'
-          }}>
-            Administrador
-          </button>
-          <button style={{
-            flex: 1,
-            padding: '8px',
-            backgroundColor: 'transparent',
-            border: '1px solid #ccc',
-            color: '#ccc',
-            borderRadius: '4px',
-            cursor: 'pointer'
-          }}>
-            Eleitor
-          </button>
+      {/* Radio buttons */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'flex-end',
+        gap: '25px',
+        marginBottom: '35px'
+      }}>
+        <label className="radio-label">
+          <input
+            type="radio"
+            name="tipo"
+            checked={tipo === 'admin'}
+            onChange={() => setTipo('admin')}
+          />
+          Administrador
+        </label>
+        <label className="radio-label">
+          <input
+            type="radio"
+            name="tipo"
+            checked={tipo === 'usuario'}
+            onChange={() => setTipo('usuario')}
+          />
+          usuário
+        </label>
+      </div>
+
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
+
+        {/* Matrícula ou Nome */}
+        <div>
+          <label style={{ color: 'white', fontSize: '16px', display: 'block', marginBottom: '8px' }}>
+            {tipo === 'admin' ? 'Matrícula' : 'Nome'}
+          </label>
+          <input
+            className="input-field"
+            type="text"
+            value={form.matricula}
+            onChange={e => setForm({ ...form, matricula: e.target.value })}
+            required
+          />
         </div>
 
-        <form onSubmit={handleSubmit}>
-          {/* Matrícula */}
-          <div style={{ marginBottom: '15px' }}>
-            <label style={{ color: 'white', fontSize: '14px', display: 'block', marginBottom: '5px' }}>
-              Matrícula
-            </label>
-            <input
-              type="text"
-              placeholder="Digite sua matrícula"
-              value={form.matricula}
-              onChange={e => setForm({ ...form, matricula: e.target.value })}
-              style={{
-                width: '100%',
-                padding: '12px',
-                borderRadius: '6px',
-                border: 'none',
-                backgroundColor: '#1a2a8a',
-                color: 'white',
-                fontSize: '14px',
-                boxSizing: 'border-box'
-              }}
-            />
+        {/* Nome da instituição */}
+        <div>
+          <label style={{ color: 'white', fontSize: '16px', display: 'block', marginBottom: '8px' }}>
+            Nome da instituição
+          </label>
+          <input
+            className="input-field"
+            type="text"
+          />
+        </div>
+
+        {/* Senha */}
+        <div>
+          <label style={{ color: 'white', fontSize: '16px', display: 'block', marginBottom: '8px' }}>
+            senha
+          </label>
+          <input
+            className="input-field"
+            type="password"
+            value={form.senha}
+            onChange={e => setForm({ ...form, senha: e.target.value })}
+            required
+          />
+        </div>
+
+        {/* Esqueceu senha */}
+        <div style={{ textAlign: 'right', marginTop: '-10px' }}>
+          <Link to="/redefinir-senha" style={{ color: 'white', fontSize: '14px', textDecoration: 'none' }}>
+            esqueceu a senha?
+          </Link>
+        </div>
+
+        {/* Erro */}
+        {erro && (
+          <div style={{
+            backgroundColor: 'rgba(255,61,0,0.2)',
+            border: '1px solid #FF3D00',
+            color: 'white',
+            padding: '12px',
+            borderRadius: '8px',
+            fontSize: '14px',
+            textAlign: 'center'
+          }}>
+            {erro}
           </div>
+        )}
 
-          {/* Nome da instituição */}
-          <div style={{ marginBottom: '15px' }}>
-            <label style={{ color: 'white', fontSize: '14px', display: 'block', marginBottom: '5px' }}>
-              Nome da instituição
-            </label>
-            <input
-              type="text"
-              placeholder="Digite sua instituição"
-              style={{
-                width: '100%',
-                padding: '12px',
-                borderRadius: '6px',
-                border: 'none',
-                backgroundColor: '#1a2a8a',
-                color: 'white',
-                fontSize: '14px',
-                boxSizing: 'border-box'
-              }}
-            />
-          </div>
+        {/* Botão Entrar */}
+        <button
+          type="submit"
+          disabled={carregando}
+          style={{
+            width: '100%',
+            padding: '18px',
+            backgroundColor: '#000',
+            color: 'white',
+            border: 'none',
+            borderRadius: '12px',
+            fontSize: '18px',
+            fontWeight: '700',
+            cursor: carregando ? 'not-allowed' : 'pointer',
+            marginTop: '10px',
+            transition: 'opacity 0.2s'
+          }}
+        >
+          {carregando ? 'Entrando...' : 'Entrar'}
+        </button>
 
-          {/* Senha */}
-          <div style={{ marginBottom: '8px' }}>
-            <label style={{ color: 'white', fontSize: '14px', display: 'block', marginBottom: '5px' }}>
-              Senha
-            </label>
-            <input
-              type="password"
-              placeholder="Digite sua senha"
-              value={form.senha}
-              onChange={e => setForm({ ...form, senha: e.target.value })}
-              style={{
-                width: '100%',
-                padding: '12px',
-                borderRadius: '6px',
-                border: 'none',
-                backgroundColor: '#1a2a8a',
-                color: 'white',
-                fontSize: '14px',
-                boxSizing: 'border-box'
-              }}
-            />
-          </div>
-
-          {/* Esqueceu senha */}
-          <div style={{ textAlign: 'right', marginBottom: '20px' }}>
-            <Link to="/redefinir-senha" style={{ color: '#ccc', fontSize: '12px' }}>
-              Esqueceu a senha?
-            </Link>
-          </div>
-
-          {/* Erro */}
-          {erro && (
-            <div style={{
-              backgroundColor: '#ff4444',
-              color: 'white',
-              padding: '10px',
-              borderRadius: '6px',
-              marginBottom: '15px',
-              fontSize: '14px',
-              textAlign: 'center'
-            }}>
-              {erro}
-            </div>
-          )}
-
-          {/* Botão Entrar */}
-          <button
-            type="submit"
-            disabled={carregando}
-            style={{
-              width: '100%',
-              padding: '14px',
-              backgroundColor: '#1a7a1a',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              fontSize: '16px',
-              fontWeight: 'bold',
-              cursor: carregando ? 'not-allowed' : 'pointer',
-              marginBottom: '15px'
-            }}
-          >
-            {carregando ? 'Entrando...' : 'Entrar'}
-          </button>
-
-          {/* Cadastro */}
-          <p style={{ color: 'white', textAlign: 'center', fontSize: '13px' }}>
-            Ainda não possui conta?{' '}
-            <Link to="/cadastro" style={{ color: '#FF4500' }}>
-              Cadastre-se
-            </Link>
-          </p>
-        </form>
-      </div>
+        {/* Cadastro */}
+        <p style={{ color: 'white', textAlign: 'center', fontSize: '15px' }}>
+          Ainda não possui uma conta?{' '}
+          <Link to="/cadastro" style={{ color: 'white', fontWeight: 'bold', textDecoration: 'underline' }}>
+            Cadastre-se
+          </Link>
+        </p>
+      </form>
     </div>
   )
 }

@@ -1,4 +1,6 @@
+import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import Splash from './pages/Splash'
 import Login from './pages/Login'
 import Cadastro from './pages/Cadastro'
 import RedefinirSenha from './pages/RedefinirSenha'
@@ -11,32 +13,29 @@ import Chapas from './pages/admin/Chapas'
 import Eleicoes from './pages/admin/Eleicoes'
 import ResultadosAdmin from './pages/admin/ResultadosAdmin'
 
-// Proteção de rota
-const RotaProtegida = ({ children }: { children: JSX.Element }) => {
+const RotaProtegida = ({ children }: { children: React.ReactNode }) => {
   const token = localStorage.getItem('token')
   if (!token) return <Navigate to="/login" />
-  return children
+  return <>{children}</>
 }
 
-const RotaAdmin = ({ children }: { children: JSX.Element }) => {
+const RotaAdmin = ({ children }: { children: React.ReactNode }) => {
   const token = localStorage.getItem('token')
   const usuario = JSON.parse(localStorage.getItem('usuario') || '{}')
   if (!token) return <Navigate to="/login" />
   if (usuario.tipo !== 'admin') return <Navigate to="/home" />
-  return children
+  return <>{children}</>
 }
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Públicas */}
-        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="/" element={<Splash />} />
         <Route path="/login" element={<Login />} />
         <Route path="/cadastro" element={<Cadastro />} />
         <Route path="/redefinir-senha" element={<RedefinirSenha />} />
 
-        {/* Eleitor */}
         <Route path="/home" element={
           <RotaProtegida><Home /></RotaProtegida>
         } />
@@ -50,7 +49,6 @@ function App() {
           <RotaProtegida><Resultados /></RotaProtegida>
         } />
 
-        {/* Admin */}
         <Route path="/admin" element={
           <RotaAdmin><Dashboard /></RotaAdmin>
         } />
@@ -62,6 +60,9 @@ function App() {
         } />
         <Route path="/admin/resultados" element={
           <RotaAdmin><ResultadosAdmin /></RotaAdmin>
+        } />
+        <Route path="/admin/painel" element={
+          <RotaAdmin><Dashboard /></RotaAdmin>
         } />
       </Routes>
     </BrowserRouter>

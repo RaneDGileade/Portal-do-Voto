@@ -10,22 +10,10 @@ export default function Dashboard() {
     eleicoes_ativas: 0,
     eleicoes_encerradas: 0
   })
-  const [carregando, setCarregando] = useState(true)
 
   useEffect(() => {
-    carregarPainel()
+    adminService.painel().then(setPainel).catch(console.error)
   }, [])
-
-  const carregarPainel = async () => {
-    try {
-      const data = await adminService.painel()
-      setPainel(data)
-    } catch (err) {
-      console.error(err)
-    } finally {
-      setCarregando(false)
-    }
-  }
 
   const handleSair = () => {
     localStorage.removeItem('token')
@@ -34,79 +22,40 @@ export default function Dashboard() {
   }
 
   const menus = [
-    {
-      label: 'Cadastrar chapas e candidatos',
-      cor: '#e6a817',
-      rota: '/admin/chapas'
-    },
-    {
-      label: 'Criar eleição',
-      cor: '#1a7a1a',
-      rota: '/admin/eleicoes'
-    },
-    {
-      label: 'Resultados',
-      cor: '#1a5a8a',
-      rota: '/admin/resultados'
-    },
-    {
-      label: 'Painel Administrativo',
-      cor: '#6a1a8a',
-      rota: '/admin'
-    },
+    { label: 'Cadastrar chapas e candidatos', cor: '#E8A020', rota: '/admin/chapas' },
+    { label: 'Criar eleição', cor: '#3A8C3F', rota: '/admin/eleicoes' },
+    { label: 'Resultados', cor: '#2B6CB0', rota: '/admin/resultados' },
+    { label: 'Painel Administrativo', cor: '#9B5BA5', rota: '/admin/painel' },
   ]
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      backgroundColor: '#0D1B6E',
-      padding: '0'
-    }}>
-      {/* Header */}
-      <div style={{
-        backgroundColor: '#0a1560',
-        padding: '15px 20px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center'
-      }}>
-        <h1 style={{ color: 'white', fontSize: '20px', margin: 0 }}>
-          Portal Do <span style={{ color: '#FF4500' }}>Voto</span>
+    <div style={{ minHeight: '100vh', backgroundColor: '#0D1B6E', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ padding: '20px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h1 style={{ color: 'white', fontSize: '24px', fontWeight: '900' }}>
+          Portal do <span style={{ color: '#FF3D00' }}>Voto</span>
         </h1>
-        <button
-          onClick={handleSair}
-          style={{
-            backgroundColor: 'transparent',
-            border: '1px solid #ccc',
-            color: '#ccc',
-            padding: '6px 12px',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            fontSize: '13px'
-          }}
-        >
-          Sair
+        <button onClick={handleSair} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'white', fontSize: '22px' }}>
+          ⎋
         </button>
       </div>
 
-      <div style={{ padding: '20px' }}>
-        {/* Menu */}
+      <div style={{ flex: 1, backgroundColor: '#F0F2F5', borderRadius: '20px 20px 0 0', padding: '30px 20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
         {menus.map((menu, i) => (
           <button
             key={i}
             onClick={() => navigate(menu.rota)}
             style={{
               width: '100%',
-              padding: '18px',
+              padding: '30px 24px',
               backgroundColor: menu.cor,
-              color: 'white',
+              color: '#000',
               border: 'none',
-              borderRadius: '8px',
-              fontSize: '16px',
-              fontWeight: 'bold',
+              borderRadius: '16px',
+              fontSize: '20px',
+              fontWeight: '800',
               cursor: 'pointer',
-              marginBottom: '12px',
-              textAlign: 'left'
+              textAlign: 'left',
+              transition: 'opacity 0.2s'
             }}
           >
             {menu.label}
@@ -114,41 +63,26 @@ export default function Dashboard() {
         ))}
 
         {/* Painel contadores */}
-        {!carregando && (
-          <div style={{ marginTop: '20px' }}>
-            <h3 style={{ color: 'white', marginBottom: '15px' }}>
-              Painel administrativo
-            </h3>
-            {[
-              { label: 'Chapas cadastradas', valor: painel.total_chapas, cor: '#e6a817' },
-              { label: 'Total de eleitores', valor: painel.total_eleitores, cor: '#1a7a1a' },
-              { label: 'Eleições ativas', valor: painel.eleicoes_ativas, cor: '#1a5a8a' },
-              { label: 'Eleições encerradas', valor: painel.eleicoes_encerradas, cor: '#6a1a8a' },
-            ].map((item, i) => (
-              <div
-                key={i}
-                style={{
-                  backgroundColor: item.cor,
-                  padding: '15px 20px',
-                  borderRadius: '8px',
-                  marginBottom: '10px',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center'
-                }}
-              >
-                <span style={{ color: 'white', fontSize: '15px' }}>{item.label}</span>
-                <span style={{
-                  color: 'white',
-                  fontSize: '24px',
-                  fontWeight: 'bold'
-                }}>
-                  {item.valor}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
+        <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {[
+            { label: 'Chapas cadastradas', valor: painel.total_chapas, cor: '#E8A020' },
+            { label: 'Total de eleitores', valor: painel.total_eleitores, cor: '#3A8C3F' },
+            { label: 'Eleições ativas', valor: painel.eleicoes_ativas, cor: '#2B6CB0' },
+            { label: 'Eleições encerradas', valor: painel.eleicoes_encerradas, cor: '#9B5BA5' },
+          ].map((item, i) => (
+            <div key={i} style={{
+              backgroundColor: item.cor,
+              padding: '15px 20px',
+              borderRadius: '12px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <span style={{ color: '#000', fontSize: '15px', fontWeight: '600' }}>{item.label}</span>
+              <span style={{ color: '#000', fontSize: '26px', fontWeight: '900' }}>{item.valor}</span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )
