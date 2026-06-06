@@ -1,8 +1,8 @@
-<img width="300" height="350" alt="Slogan (1)" src="https://github.com/user-attachments/assets/fb2c84fb-b50d-4e65-ba22-adb250b168f2" />
+<img width="200" height="250" alt="Slogan (1)" src="https://github.com/user-attachments/assets/fb2c84fb-b50d-4e65-ba22-adb250b168f2" />
 
-<img width="300" height="350" alt="Home aluno" src="https://github.com/user-attachments/assets/839caa44-7569-4728-90a1-506d90c7ae13" />
+<img width="200" height="250" alt="Home aluno" src="https://github.com/user-attachments/assets/839caa44-7569-4728-90a1-506d90c7ae13" />
 
-<img width="300" height="350" alt="tela votação" src="https://github.com/user-attachments/assets/6fb023d5-ebd4-476a-a89c-ce2d24a5a203" />
+<img width="200" height="250" alt="tela votação" src="https://github.com/user-attachments/assets/6fb023d5-ebd4-476a-a89c-ce2d24a5a203" />
 
 
 # Portal do Voto
