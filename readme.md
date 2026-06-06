@@ -37,7 +37,7 @@ Portal do Voto é uma plataforma de votação eletrônica pensada para simulaç�
 
 ## Instalação
 
-Os links de instalação e os detalhes completos de configuração do ambiente serão disponibilizados em breve pelo desenvolvedor. Enquanto isso, as instruções de setup local estão descritas abaixo para referência.
+Os links de instalação e os detalhes completos de configuração do ambiente serão disponibilizados em breve pelo desenvolvedor.
 
 ## Uso
 - Use o painel administrativo para criar eleições e chapas.
