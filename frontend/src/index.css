@@ -2,7 +2,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-family: 'Poppins', sans-serif;
 }
 
 body {
@@ -34,16 +34,117 @@ body {
 
 input[type="radio"] {
   accent-color: #FF3D00;
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   cursor: pointer;
 }
 
 input::placeholder {
-  color: rgba(255,255,255,0.3);
+  color: rgba(255,255,255,0.0);
+}
+
+button {
+  transition: opacity 0.2s, transform 0.1s;
 }
 
 button:active {
   opacity: 0.85;
   transform: scale(0.98);
+}
+
+.input-field {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1.5px solid rgba(255,255,255,0.4);
+  color: white;
+  font-size: 16px;
+  font-family: 'Poppins', sans-serif;
+  padding: 8px 0;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input-field:focus {
+  border-bottom-color: white;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 18px;
+  background-color: #000;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 20px;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+}
+
+.btn-link {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.slide-in {
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+/* Sidebar */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -320px;
+  width: 280px;
+  height: 100vh;
+  background-color: #060f3d;
+  z-index: 1000;
+  transition: left 0.3s ease;
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar.open {
+  left: 0;
+}
+
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.5);
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.sidebar-overlay.open {
+  opacity: 1;
+  pointer-events: all;
 }

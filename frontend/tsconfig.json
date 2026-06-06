@@ -12,7 +12,8 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "strict": false,
-    "verbatimModuleSyntax": false
+    "verbatimModuleSyntax": false,
+    "types": ["vite/client"]
   },
   "include": ["src"]
 }

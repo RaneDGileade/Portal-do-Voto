@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { chapaService, eleicaoService } from '../services/api'
-import { Chapa, Eleicao } from '../types'
+import type { Chapa, Eleicao } from '../types'
 
 export default function Candidatos() {
   const navigate = useNavigate()
@@ -11,161 +11,108 @@ export default function Candidatos() {
   const [carregando, setCarregando] = useState(true)
 
   useEffect(() => {
-    carregarDados()
+    Promise.all([
+      chapaService.listarPorEleicao(Number(eleicaoId)),
+      eleicaoService.buscar(Number(eleicaoId))
+    ]).then(([c, e]) => {
+      setChapas(c)
+      setEleicao(e)
+    }).catch(console.error)
+    .finally(() => setCarregando(false))
   }, [])
 
-  const carregarDados = async () => {
-    try {
-      const [chapasData, eleicaoData] = await Promise.all([
-        chapaService.listarPorEleicao(Number(eleicaoId)),
-        eleicaoService.buscar(Number(eleicaoId))
-      ])
-      setChapas(chapasData)
-      setEleicao(eleicaoData)
-    } catch (err) {
-      console.error(err)
-    } finally {
-      setCarregando(false)
-    }
-  }
-
   return (
-    <div style={{
-      minHeight: '100vh',
-      backgroundColor: '#0D1B6E',
-      padding: '0'
-    }}>
+    <div style={{ minHeight: '100vh', backgroundColor: '#0D1B6E', display: 'flex', flexDirection: 'column' }}>
+
       {/* Header */}
-      <div style={{
-        backgroundColor: '#0a1560',
-        padding: '15px 20px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center'
-      }}>
-        <h1 style={{ color: 'white', fontSize: '20px', margin: 0 }}>
-          Portal Do <span style={{ color: '#FF4500' }}>Voto</span>
+      <div style={{ padding: '16px 24px', textAlign: 'center' }}>
+        <h1 style={{ color: 'white', fontSize: '22px', fontWeight: '700' }}>
+          Portal do <span style={{ color: '#FF3D00' }}>Voto</span>
         </h1>
       </div>
 
-      <div style={{ padding: '20px' }}>
-        <h2 style={{ color: 'white', fontSize: '18px', marginBottom: '5px' }}>
+      {/* Card */}
+      <div style={{
+        flex: 1,
+        backgroundColor: '#F0F2F5',
+        borderRadius: '20px 20px 0 0',
+        padding: '24px 20px',
+        display: 'flex',
+        flexDirection: 'column'
+      }}>
+        <h2 style={{ color: '#000', fontSize: '22px', fontWeight: '700', textAlign: 'center', marginBottom: '24px' }}>
           Candidatos
         </h2>
-        {eleicao && (
-          <p style={{ color: '#ccc', fontSize: '14px', marginBottom: '20px' }}>
-            {eleicao.titulo}
-          </p>
-        )}
 
         {carregando ? (
-          <p style={{ color: '#ccc' }}>Carregando...</p>
+          <p style={{ color: '#888', textAlign: 'center' }}>Carregando...</p>
         ) : chapas.length === 0 ? (
-          <div style={{
-            backgroundColor: '#1a2a8a',
-            padding: '20px',
-            borderRadius: '8px',
-            textAlign: 'center'
-          }}>
-            <p style={{ color: '#ccc' }}>
-              Nenhum candidato cadastrado ainda para esta eleição.
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <p style={{ color: '#888', fontSize: '18px', fontWeight: '600', textAlign: 'center' }}>
+              Ainda não existe chapas criadas para esta eleição
             </p>
           </div>
         ) : (
-          chapas.map(chapa => (
-            <div
-              key={chapa.id}
-              style={{
-                backgroundColor: '#1a2a8a',
-                padding: '15px',
-                borderRadius: '8px',
-                marginBottom: '15px',
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', flex: 1 }}>
+            {chapas.map(chapa => (
+              <div key={chapa.id} style={{
+                backgroundColor: '#8B9FE8',
+                borderRadius: '16px',
+                padding: '16px',
                 display: 'flex',
-                alignItems: 'center',
-                gap: '15px'
-              }}
-            >
-              {/* Foto */}
-              {chapa.foto_url ? (
-                <img
-                  src={chapa.foto_url}
-                  alt={chapa.nome}
-                  style={{
-                    width: '70px',
-                    height: '70px',
-                    borderRadius: '50%',
-                    objectFit: 'cover',
-                    flexShrink: 0
-                  }}
-                />
-              ) : (
-                <div style={{
-                  width: '70px',
-                  height: '70px',
-                  borderRadius: '50%',
-                  backgroundColor: '#0D1B6E',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#ccc',
-                  fontSize: '28px',
-                  flexShrink: 0
-                }}>
-                  👤
-                </div>
-              )}
-
-              {/* Info */}
-              <div style={{ flex: 1 }}>
-                <h3 style={{ color: 'white', margin: '0 0 5px 0', fontSize: '16px' }}>
-                  {chapa.nome}
-                </h3>
-                <p style={{ color: '#FF4500', margin: '0 0 5px 0', fontSize: '14px' }}>
-                  Número: {chapa.numero}
-                </p>
-                {chapa.descricao && (
-                  <p style={{ color: '#ccc', margin: 0, fontSize: '13px' }}>
-                    {chapa.descricao}
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}>
+                <div>
+                  <p style={{ color: '#000', fontSize: '14px', marginBottom: '4px' }}>
+                    <strong>Chapa:</strong><br />{chapa.nome}
                   </p>
+                  <p style={{ color: '#000', fontSize: '14px', marginBottom: '4px' }}>
+                    <strong>Candidato:</strong><br />{chapa.nome}
+                  </p>
+                  <p style={{ color: '#000', fontSize: '14px' }}>
+                    <strong>Número de voto:</strong> {chapa.numero}
+                  </p>
+                </div>
+                {chapa.foto_url ? (
+                  <img src={chapa.foto_url} alt={chapa.nome} style={{
+                    width: '90px', height: '110px',
+                    objectFit: 'cover', borderRadius: '8px'
+                  }} />
+                ) : (
+                  <div style={{
+                    width: '90px', height: '110px',
+                    backgroundColor: '#c0c8f0',
+                    borderRadius: '8px',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: '30px'
+                  }}>
+                    👤
+                  </div>
                 )}
               </div>
-            </div>
-          ))
+            ))}
+          </div>
         )}
 
-        {/* Botões */}
-        <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-          <button
-            onClick={() => navigate('/home')}
-            style={{
-              flex: 1,
-              padding: '14px',
-              backgroundColor: '#8a1a1a',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              fontSize: '14px',
-              cursor: 'pointer'
-            }}
-          >
-            Voltar
-          </button>
-          <button
-            onClick={() => navigate(`/votacao/${eleicaoId}`)}
-            style={{
-              flex: 1,
-              padding: '14px',
-              backgroundColor: '#1a7a1a',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              fontSize: '14px',
-              cursor: 'pointer'
-            }}
-          >
-            Votar
-          </button>
-        </div>
+        <button
+          onClick={() => navigate('/home')}
+          style={{
+            width: '100%',
+            padding: '18px',
+            backgroundColor: '#2F855A',
+            color: 'white',
+            border: 'none',
+            borderRadius: '12px',
+            fontSize: '18px',
+            fontWeight: '600',
+            cursor: 'pointer',
+            fontFamily: 'Poppins, sans-serif',
+            marginTop: '20px'
+          }}
+        >
+          voltar
+        </button>
       </div>
     </div>
   )
