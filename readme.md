@@ -5,9 +5,12 @@
 <img width="300" height="350" alt="tela votação" src="https://github.com/user-attachments/assets/6fb023d5-ebd4-476a-a89c-ce2d24a5a203" />
 <br>
 <br>
-🗳️ O Portal do Voto é uma plataforma digital desenvolvida para criar, gerenciar e simular eleições de forma simples e segura. O aplicativo é ideal para ambientes escolares (grêmios, líderes de sala), acadêmicos, condomínios e simulações pedagógicas de eleições oficiais.🚀
-
- Funcionalidades PrincipaisCriação de Eleições: Painel simples para configurar cargos, candidatos e fotos.
+🗳️ O Portal do Voto é uma plataforma digital desenvolvida para criar, gerenciar e simular eleições de forma simples e segura. O aplicativo é ideal para ambientes escolares (grêmios, líderes de sala), acadêmicos, condomínios e simulações pedagógicas de eleições oficiais.
+<br>
+<br>
+ Funcionalidades Principais:
+ 
+ Criação de Eleições: Painel simples para configurar cargos, candidatos e fotos.
  
  Simulação Escolar e Geral: Interface intuitiva adaptada para estudantes e organizações.
  
