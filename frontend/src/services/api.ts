@@ -74,6 +74,13 @@ export const eleicaoService = {
     return response.data
   },
 
+  buscarPorTitulo: async (titulo: string) => {
+    const response = await api.get('/eleicoes/buscar-por-titulo', {
+      params: { titulo }
+    })
+    return response.data
+  },
+
   criar: async (dados: any) => {
     const response = await api.post('/eleicoes/', dados)
     return response.data

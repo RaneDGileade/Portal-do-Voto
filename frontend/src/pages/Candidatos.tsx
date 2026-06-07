@@ -9,6 +9,7 @@ export default function Candidatos() {
   const [chapas, setChapas] = useState<Chapa[]>([])
   const [eleicao, setEleicao] = useState<Eleicao | null>(null)
   const [carregando, setCarregando] = useState(true)
+  const [erro, setErro] = useState('')
 
   useEffect(() => {
     Promise.all([
@@ -17,9 +18,12 @@ export default function Candidatos() {
     ]).then(([c, e]) => {
       setChapas(c)
       setEleicao(e)
-    }).catch(console.error)
-    .finally(() => setCarregando(false))
-  }, [])
+    }).catch((err: any) => {
+      console.error(err)
+      setErro(err.response?.data?.detail || 'Erro ao carregar dados da eleição')
+    })
+      .finally(() => setCarregando(false))
+  }, [eleicaoId])
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#0D1B6E', display: 'flex', flexDirection: 'column' }}>
@@ -40,12 +44,23 @@ export default function Candidatos() {
         display: 'flex',
         flexDirection: 'column'
       }}>
-        <h2 style={{ color: '#000', fontSize: '22px', fontWeight: '700', textAlign: 'center', marginBottom: '24px' }}>
+        <h2 style={{ color: '#000', fontSize: '22px', fontWeight: '700', textAlign: 'center', marginBottom: '8px' }}>
           Candidatos
         </h2>
+        {eleicao && (
+          <p style={{ color: '#4A5568', textAlign: 'center', marginBottom: '20px' }}>
+            Eleição: <strong>{eleicao.titulo}</strong> — Status: <strong>{eleicao.status === 'ativa' ? 'Ativa' : eleicao.status === 'encerrada' ? 'Encerrada' : 'Rascunho'}</strong>
+          </p>
+        )}
 
         {carregando ? (
           <p style={{ color: '#888', textAlign: 'center' }}>Carregando...</p>
+        ) : erro ? (
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <p style={{ color: '#E53E3E', fontSize: '18px', fontWeight: '600', textAlign: 'center' }}>
+              {erro}
+            </p>
+          </div>
         ) : chapas.length === 0 ? (
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <p style={{ color: '#888', fontSize: '18px', fontWeight: '600', textAlign: 'center' }}>

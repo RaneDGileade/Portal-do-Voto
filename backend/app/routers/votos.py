@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from .. import models, schemas
 from ..database import get_db
 from ..auth import get_usuario_atual
+from ..utils import sincronizar_status_eleicao
 
 router = APIRouter()
 
@@ -20,6 +21,8 @@ def registrar_voto(
 
     if not eleicao:
         raise HTTPException(status_code=404, detail="Eleição não encontrada")
+
+    sincronizar_status_eleicao(eleicao, db)
 
     if eleicao.status != "ativa":
         raise HTTPException(

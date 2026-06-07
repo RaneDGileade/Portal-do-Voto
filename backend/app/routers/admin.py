@@ -4,6 +4,7 @@ from typing import List
 from .. import models, schemas
 from ..database import get_db
 from ..auth import get_admin_atual
+from ..utils import sincronizar_status_todos
 
 router = APIRouter()
 
@@ -13,6 +14,7 @@ def painel_admin(
     db: Session = Depends(get_db),
     usuario=Depends(get_admin_atual)
 ):
+    sincronizar_status_todos(db)
     total_chapas = db.query(models.Chapa).count()
     total_eleitores = db.query(models.Usuario).filter(
         models.Usuario.tipo == "eleitor"
@@ -37,6 +39,7 @@ def listar_eleitores(
     db: Session = Depends(get_db),
     usuario=Depends(get_admin_atual)
 ):
+    sincronizar_status_todos(db)
     return db.query(models.Usuario).filter(
         models.Usuario.tipo == "eleitor"
     ).all()
@@ -83,6 +86,7 @@ def resultados_parciais(
     db: Session = Depends(get_db),
     usuario=Depends(get_admin_atual)
 ):
+    sincronizar_status_todos(db)
     eleicoes = db.query(models.Eleicao).all()
     resultado = []
 

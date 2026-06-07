@@ -1,17 +1,19 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { chapaService, votoService } from '../services/api'
-import type { Chapa } from '../types'
+import { chapaService, eleicaoService, votoService } from '../services/api'
+import type { Chapa, Eleicao } from '../types'
 
 export default function Votacao() {
   const navigate = useNavigate()
   const { eleicaoId } = useParams()
   const [numero, setNumero] = useState(['', ''])
   const [chapa, setChapa] = useState<Chapa | null>(null)
+  const [eleicao, setEleicao] = useState<Eleicao | null>(null)
   const [erro, setErro] = useState('')
   const [votado, setVotado] = useState(false)
   const [modal, setModal] = useState<'candidato' | 'branco' | null>(null)
   const [carregando, setCarregando] = useState(false)
+  const [carregandoEleicao, setCarregandoEleicao] = useState(true)
 
   const handleNumero = async (n: string) => {
     const vazio = numero.findIndex(d => d === '')
@@ -67,6 +69,11 @@ export default function Votacao() {
   }
 
   const handleConfirmar = () => {
+    if (eleicao?.status !== 'ativa') {
+      setErro('A eleição não está ativa no momento')
+      return
+    }
+
     if (!chapa && numero[0] === '') {
       setModal('branco')
     } else if (!chapa) {
@@ -126,6 +133,59 @@ export default function Votacao() {
               fontFamily: 'Poppins, sans-serif'
             }}
           >
+            Voltar
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  useEffect(() => {
+    const carregarEleicao = async () => {
+      try {
+        const data = await eleicaoService.buscar(Number(eleicaoId))
+        setEleicao(data)
+      } catch (err: any) {
+        setErro(err.response?.data?.detail || 'Erro ao consultar a eleição')
+      } finally {
+        setCarregandoEleicao(false)
+      }
+    }
+
+    carregarEleicao()
+  }, [eleicaoId])
+
+  if (carregandoEleicao) {
+    return (
+      <div style={{ minHeight: '100vh', backgroundColor: '#0D1B6E', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+        <p style={{ color: 'white', fontSize: '18px' }}>Carregando eleição...</p>
+      </div>
+    )
+  }
+
+  if (!eleicao) {
+    return (
+      <div style={{ minHeight: '100vh', backgroundColor: '#0D1B6E', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+        <p style={{ color: 'white', fontSize: '18px' }}>Eleição não encontrada.</p>
+        <button onClick={() => navigate('/home')} style={{ marginTop: '20px', padding: '14px 20px', backgroundColor: '#2F855A', color: 'white', border: 'none', borderRadius: '10px', cursor: 'pointer' }}>
+          Voltar
+        </button>
+      </div>
+    )
+  }
+
+  if (eleicao.status !== 'ativa') {
+    return (
+      <div style={{ minHeight: '100vh', backgroundColor: '#0D1B6E', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '24px' }}>
+        <div style={{ backgroundColor: '#F0F2F5', borderRadius: '20px', padding: '32px', maxWidth: '420px', textAlign: 'center' }}>
+          <h2 style={{ margin: 0, color: '#1A202C', fontSize: '24px' }}>Eleição {eleicao.status === 'encerrada' ? 'encerrada' : 'não ativa'}</h2>
+          <p style={{ color: '#4A5568', marginTop: '12px' }}>
+            Esta eleição não aceita votos no momento. Você pode consultar os candidatos ou ver os resultados.
+          </p>
+          <button onClick={() => navigate(`/resultados/${eleicao.id}`)} style={{ marginTop: '22px', padding: '14px 20px', backgroundColor: '#2B6CB0', color: 'white', border: 'none', borderRadius: '10px', cursor: 'pointer' }}>
+            Ver resultados
+          </button>
+          <button onClick={() => navigate('/home')} style={{ marginTop: '12px', padding: '14px 20px', backgroundColor: '#718096', color: 'white', border: 'none', borderRadius: '10px', cursor: 'pointer' }}>
             Voltar
           </button>
         </div>
@@ -207,7 +267,7 @@ export default function Votacao() {
 
       {/* Teclado */}
       <div style={{ padding: '0 12px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
-        {['1','2','3','4','5','6','7','8','9'].map(n => (
+        {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map(n => (
           <button key={n} onClick={() => handleNumero(n)} style={{
             padding: '20px',
             backgroundColor: '#000',

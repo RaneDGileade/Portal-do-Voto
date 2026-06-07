@@ -1,23 +1,35 @@
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from typing import List
 from .. import models, schemas
 from ..database import get_db
 from ..auth import get_usuario_atual, get_admin_atual
+from ..utils import sincronizar_status_eleicao, sincronizar_status_todos
 
 router = APIRouter()
 
 
 @router.get("/", response_model=List[schemas.Eleicao])
 def listar_eleicoes(db: Session = Depends(get_db)):
+    sincronizar_status_todos(db)
     return db.query(models.Eleicao).all()
 
 
 @router.get("/ativas", response_model=List[schemas.Eleicao])
 def listar_eleicoes_ativas(db: Session = Depends(get_db)):
+    sincronizar_status_todos(db)
     return db.query(models.Eleicao).filter(
         models.Eleicao.status == "ativa"
     ).all()
+
+
+@router.get("/buscar-por-titulo", response_model=List[schemas.Eleicao])
+def buscar_eleicao_por_titulo(titulo: str, db: Session = Depends(get_db)):
+    sincronizar_status_todos(db)
+    busca_normalizada = titulo.strip().lower()
+    return db.query(models.Eleicao).filter(func.lower(models.Eleicao.titulo) == busca_normalizada).all()
 
 
 @router.get("/{eleicao_id}", response_model=schemas.Eleicao)
@@ -28,6 +40,8 @@ def buscar_eleicao(eleicao_id: int, db: Session = Depends(get_db)):
 
     if not eleicao:
         raise HTTPException(status_code=404, detail="Eleição não encontrada")
+
+    sincronizar_status_eleicao(eleicao, db)
     return eleicao
 
 
@@ -89,6 +103,15 @@ def deletar_eleicao(
 
 @router.get("/{eleicao_id}/resultado", response_model=List[schemas.ResultadoChapa])
 def resultado_eleicao(eleicao_id: int, db: Session = Depends(get_db)):
+    eleicao = db.query(models.Eleicao).filter(
+        models.Eleicao.id == eleicao_id
+    ).first()
+
+    if not eleicao:
+        raise HTTPException(status_code=404, detail="Eleição não encontrada")
+
+    sincronizar_status_eleicao(eleicao, db)
+
     chapas = db.query(models.Chapa).filter(
         models.Chapa.eleicao_id == eleicao_id
     ).all()

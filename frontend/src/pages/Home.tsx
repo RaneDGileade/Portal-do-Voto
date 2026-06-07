@@ -5,11 +5,37 @@ import type { Eleicao, Usuario } from '../types'
 
 export default function Home() {
   const navigate = useNavigate()
-  const [eleicoes, setEleicoes] = useState<Eleicao[]>([])
+  const [eleicaoSelecionada, setEleicaoSelecionada] = useState<Eleicao | null>(null)
+  const [carregando, setCarregando] = useState(true)
+  const [erroEleicao, setErroEleicao] = useState('')
   const usuario: Usuario = JSON.parse(localStorage.getItem('usuario') || '{}')
 
   useEffect(() => {
-    eleicaoService.listarAtivas().then(setEleicoes).catch(console.error)
+    const storedId = Number(localStorage.getItem('eleicaoSelecionada') || '0')
+    const carregarEleicao = async () => {
+      try {
+        if (storedId) {
+          const eleicao = await eleicaoService.buscar(storedId)
+          setEleicaoSelecionada(eleicao)
+          return
+        }
+
+        const eleicoesAtivas = await eleicaoService.listarAtivas()
+        if (eleicoesAtivas.length > 0) {
+          setEleicaoSelecionada(eleicoesAtivas[0])
+          return
+        }
+
+        setErroEleicao('Nenhuma eleição ativa encontrada. Verifique o nome da eleição no login.')
+      } catch (err) {
+        console.error(err)
+        setErroEleicao('Erro ao carregar a eleição. Faça login novamente informando o nome correto.')
+      } finally {
+        setCarregando(false)
+      }
+    }
+
+    carregarEleicao()
   }, [])
 
   const handleSair = () => {
@@ -19,9 +45,9 @@ export default function Home() {
   }
 
   const menus = [
-    { label: 'Votar', cor: '#E8A020', rota: eleicoes[0] ? `/votacao/${eleicoes[0].id}` : '#' },
-    { label: 'Ver candidatos', cor: '#3A8C3F', rota: eleicoes[0] ? `/candidatos/${eleicoes[0].id}` : '#' },
-    { label: 'Ver resultados', cor: '#2B6CB0', rota: eleicoes[0] ? `/resultados/${eleicoes[0].id}` : '#' },
+    { label: 'Votar', cor: '#E8A020', rota: eleicaoSelecionada ? `/votacao/${eleicaoSelecionada.id}` : '#', disabled: !eleicaoSelecionada || eleicaoSelecionada.status !== 'ativa' },
+    { label: 'Ver candidatos', cor: '#3A8C3F', rota: eleicaoSelecionada ? `/candidatos/${eleicaoSelecionada.id}` : '#', disabled: !eleicaoSelecionada },
+    { label: 'Ver resultados', cor: '#2B6CB0', rota: eleicaoSelecionada ? `/resultados/${eleicaoSelecionada.id}` : '#', disabled: !eleicaoSelecionada },
   ]
 
   return (
@@ -39,10 +65,40 @@ export default function Home() {
         <p style={{ color: '#333', fontSize: '16px', marginBottom: '10px' }}>
           Olá, <strong>{usuario.nome}</strong>! Selecione uma opção:
         </p>
+
+        {carregando ? (
+          <p style={{ color: '#666', fontSize: '16px' }}>Carregando eleição selecionada...</p>
+        ) : erroEleicao ? (
+          <div style={{ backgroundColor: '#F8D7DA', color: '#842029', padding: '16px', borderRadius: '12px' }}>
+            <strong>Eleição não localizada.</strong>
+            <p style={{ margin: '8px 0 0', fontSize: '14px' }}>{erroEleicao}</p>
+          </div>
+        ) : eleicaoSelecionada ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ padding: '16px', borderRadius: '16px', backgroundColor: '#E2E8F0' }}>
+              <p style={{ margin: 0, color: '#1A202C', fontSize: '14px' }}>Eleição selecionada</p>
+              <h2 style={{ margin: '8px 0 0', color: '#2D3748', fontSize: '20px' }}>{eleicaoSelecionada.titulo}</h2>
+              <p style={{ margin: '8px 0 0', color: '#4A5568', fontSize: '14px' }}>
+                Status: <strong>{eleicaoSelecionada.status === 'ativa' ? 'Ativa' : eleicaoSelecionada.status === 'encerrada' ? 'Encerrada' : 'Rascunho'}</strong>
+              </p>
+              {eleicaoSelecionada.status !== 'ativa' && (
+                <p style={{ margin: '6px 0 0', color: '#718096', fontSize: '13px' }}>
+                  Esta eleição não está ativa. Você ainda pode consultar candidatos e resultados.
+                </p>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div style={{ backgroundColor: '#FEF3C7', color: '#92400E', padding: '18px', borderRadius: '14px' }}>
+            <p style={{ margin: 0 }}>Nenhuma eleição encontrada. Faça login novamente informando o nome correto da eleição.</p>
+          </div>
+        )}
+
         {menus.map((menu, i) => (
           <button
             key={i}
-            onClick={() => navigate(menu.rota)}
+            onClick={() => menu.disabled ? undefined : navigate(menu.rota)}
+            disabled={menu.disabled}
             style={{
               width: '100%',
               padding: '30px 24px',
@@ -52,8 +108,9 @@ export default function Home() {
               borderRadius: '16px',
               fontSize: '20px',
               fontWeight: '800',
-              cursor: 'pointer',
+              cursor: menu.disabled ? 'not-allowed' : 'pointer',
               textAlign: 'left',
+              opacity: menu.disabled ? 0.55 : 1,
               transition: 'opacity 0.2s'
             }}
           >

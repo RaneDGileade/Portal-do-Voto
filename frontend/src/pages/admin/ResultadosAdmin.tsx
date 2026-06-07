@@ -45,130 +45,92 @@ export default function ResultadosAdmin() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#0D1B6E', padding: '0' }}>
+    <div className="page-shell">
       {/* Header */}
-      <div style={{
-        backgroundColor: '#0a1560',
-        padding: '15px 20px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center'
-      }}>
-        <h1 style={{ color: 'white', fontSize: '20px', margin: 0 }}>
-          Portal Do <span style={{ color: '#FF4500' }}>Voto</span>
-        </h1>
+      <div className="page-header">
+        <h1>Portal Do <span>Voto</span></h1>
       </div>
 
-      <div style={{ padding: '20px' }}>
-        <h2 style={{ color: 'white', fontSize: '18px', marginBottom: '20px' }}>
-          Resultados parciais
-        </h2>
+      <div className="page-card">
+        <div className="page-card-center">
+          <h2 className="page-title">Resultados parciais</h2>
 
-        {carregando ? (
-          <p style={{ color: '#ccc' }}>Carregando...</p>
-        ) : resultados.length === 0 ? (
-          <div style={{
-            backgroundColor: '#1a2a8a',
-            padding: '20px',
-            borderRadius: '8px',
-            textAlign: 'center'
-          }}>
-            <p style={{ color: '#ccc' }}>Nenhuma eleição criada ainda.</p>
-          </div>
-        ) : (
-          resultados.map(eleicao => (
-            <div
-              key={eleicao.eleicao_id}
-              style={{
-                backgroundColor: '#1a2a8a',
-                padding: '15px',
-                borderRadius: '8px',
-                marginBottom: '20px'
-              }}
-            >
-              {/* Cabeçalho eleição */}
-              <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: '15px'
-              }}>
-                <h3 style={{ color: 'white', margin: 0, fontSize: '16px' }}>
-                  {eleicao.titulo}
-                </h3>
-                <span style={{
-                  backgroundColor: corStatus(eleicao.status),
-                  color: 'white',
-                  padding: '3px 10px',
-                  borderRadius: '12px',
-                  fontSize: '12px'
-                }}>
-                  {eleicao.status}
-                </span>
-              </div>
-
-              <p style={{ color: '#ccc', fontSize: '13px', marginBottom: '15px' }}>
-                Total de votos: <strong style={{ color: 'white' }}>{eleicao.total_votos}</strong>
+          {carregando ? (
+            <p style={{ color: '#475569' }}>Carregando...</p>
+          ) : resultados.length === 0 ? (
+            <div className="card" style={{ textAlign: 'center' }}>
+              <h3 style={{ marginBottom: '12px' }}>Nada criado ainda</h3>
+              <p style={{ color: '#64748B', marginBottom: '20px' }}>
+                Cadastre uma eleição ou chapas primeiro para ver resultados administrativos.
               </p>
-
-              {/* Chapas */}
-              {eleicao.chapas.length === 0 ? (
-                <p style={{ color: '#ccc', fontSize: '13px' }}>
-                  Nenhuma chapa cadastrada.
-                </p>
-              ) : (
-                eleicao.chapas.map((chapa, index) => (
-                  <div key={chapa.chapa_id} style={{ marginBottom: '12px' }}>
-                    <div style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      marginBottom: '5px'
-                    }}>
-                      <span style={{ color: 'white', fontSize: '14px' }}>
-                        {index === 0 && '🏆 '}{chapa.nome} ({chapa.numero})
-                      </span>
-                      <span style={{ color: '#ccc', fontSize: '13px' }}>
-                        {chapa.total_votos} votos — {chapa.percentual}%
-                      </span>
-                    </div>
-
-                    {/* Barra progresso */}
-                    <div style={{
-                      backgroundColor: '#0D1B6E',
-                      borderRadius: '4px',
-                      height: '8px'
-                    }}>
-                      <div style={{
-                        backgroundColor: index === 0 ? '#FFD700' : '#1a5a8a',
-                        height: '100%',
-                        borderRadius: '4px',
-                        width: `${chapa.percentual}%`,
-                        transition: 'width 0.5s ease'
-                      }} />
-                    </div>
-                  </div>
-                ))
-              )}
+              <button onClick={() => navigate('/admin/eleicoes')} className="button-primary" style={{ backgroundColor: '#3A8C3F' }}>
+                Criar eleição
+              </button>
             </div>
-          ))
-        )}
+          ) : (
+            resultados.map(eleicao => (
+              <div key={eleicao.eleicao_id} className="card" style={{ marginBottom: '20px' }}>
+                {/* Cabeçalho eleição */}
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '15px'
+                }}>
+                  <h3 style={{ color: 'white', margin: 0, fontSize: '16px' }}>
+                    {eleicao.titulo}
+                  </h3>
+                  <span style={{
+                    backgroundColor: corStatus(eleicao.status),
+                    color: 'white',
+                    padding: '3px 10px',
+                    borderRadius: '12px',
+                    fontSize: '12px'
+                  }}>
+                    {eleicao.status}
+                  </span>
+                </div>
 
-        <button
-          onClick={() => navigate('/admin')}
-          style={{
-            width: '100%',
-            padding: '14px',
-            backgroundColor: '#8a1a1a',
-            color: 'white',
-            border: 'none',
-            borderRadius: '6px',
-            fontSize: '14px',
-            cursor: 'pointer',
-            marginTop: '10px'
-          }}
-        >
-          Voltar
-        </button>
+                <p style={{ color: '#ccc', fontSize: '13px', marginBottom: '15px' }}>
+                  Total de votos: <strong style={{ color: 'white' }}>{eleicao.total_votos}</strong>
+                </p>
+
+                {/* Chapas */}
+                {eleicao.chapas.length === 0 ? (
+                  <p style={{ color: '#ccc', fontSize: '13px' }}>
+                    Nenhuma chapa cadastrada.
+                  </p>
+                ) : (
+                  eleicao.chapas.map((chapa, index) => (
+                    <div key={chapa.chapa_id} style={{ marginBottom: '12px' }}>
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        marginBottom: '5px'
+                      }}>
+                        <span style={{ color: 'white', fontSize: '14px' }}>
+                          {index === 0 && '🏆 '}{chapa.nome} ({chapa.numero})
+                        </span>
+                        <span style={{ color: '#ccc', fontSize: '13px' }}>
+                          {chapa.total_votos} votos — {chapa.percentual}%
+                        </span>
+                      </div>
+
+                      {/* Barra progresso */}
+                      <div className="progress-bar">
+                        <div className="progress-fill" style={{ width: `${chapa.percentual}%`, backgroundColor: index === 0 ? '#FFD700' : '#1A5A8A' }} />
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            ))
+          )}
+
+          <button onClick={() => navigate('/admin')} className="button-secondary button-block" style={{ marginTop: '10px', backgroundColor: '#8A1A1A' }}>
+            Voltar
+          </button>
+        </div>
       </div>
     </div>
   )

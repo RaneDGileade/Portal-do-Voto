@@ -80,260 +80,144 @@ export default function Chapas() {
     }
   }
 
-  const inputStyle = {
-    width: '100%',
-    padding: '12px',
-    borderRadius: '6px',
-    border: 'none',
-    backgroundColor: '#1a2a8a',
-    color: 'white',
-    fontSize: '14px',
-    boxSizing: 'border-box' as const
-  }
-
-  const labelStyle = {
-    color: 'white',
-    fontSize: '14px',
-    display: 'block',
-    marginBottom: '5px'
-  }
-
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#0D1B6E', padding: '0' }}>
-      {/* Header */}
-      <div style={{
-        backgroundColor: '#0a1560',
-        padding: '15px 20px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center'
-      }}>
-        <h1 style={{ color: 'white', fontSize: '20px', margin: 0 }}>
-          Portal Do <span style={{ color: '#FF4500' }}>Voto</span>
-        </h1>
+    <div className="page-shell">
+      <div className="page-header">
+        <h1>Portal Do <span>Voto</span></h1>
       </div>
 
-      <div style={{ padding: '20px' }}>
-        <h2 style={{ color: 'white', fontSize: '18px', marginBottom: '20px' }}>
-          {editando ? 'Editar chapa' : 'Cadastro de chapas'}
-        </h2>
+      <div className="page-card">
+        <div className="page-card-center">
+          <h2 className="page-title">{editando ? 'Editar chapa' : 'Cadastro de chapas'}</h2>
 
-        {/* Formulário */}
-        <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '15px' }}>
-            <label style={labelStyle}>Eleição</label>
-            <select
-              value={form.eleicao_id}
-              onChange={e => setForm({ ...form, eleicao_id: Number(e.target.value) })}
-              style={{ ...inputStyle }}
-              required
-            >
-              <option value={0}>Selecione uma eleição</option>
-              {eleicoes.map(e => (
-                <option key={e.id} value={e.id}>{e.titulo}</option>
-              ))}
-            </select>
-          </div>
-
-          <div style={{ marginBottom: '15px' }}>
-            <label style={labelStyle}>Nome da chapa</label>
-            <input
-              type="text"
-              placeholder="Nome da chapa"
-              value={form.nome}
-              onChange={e => setForm({ ...form, nome: e.target.value })}
-              style={inputStyle}
-              required
-            />
-          </div>
-
-          <div style={{ marginBottom: '15px' }}>
-            <label style={labelStyle}>Número (2 dígitos)</label>
-            <input
-              type="text"
-              placeholder="Ex: 01"
-              maxLength={2}
-              value={form.numero}
-              onChange={e => setForm({ ...form, numero: e.target.value })}
-              style={inputStyle}
-              required
-            />
-          </div>
-
-          <div style={{ marginBottom: '15px' }}>
-            <label style={labelStyle}>URL da foto</label>
-            <input
-              type="text"
-              placeholder="https://..."
-              value={form.foto_url}
-              onChange={e => setForm({ ...form, foto_url: e.target.value })}
-              style={inputStyle}
-            />
-          </div>
-
-          <div style={{ marginBottom: '20px' }}>
-            <label style={labelStyle}>Descrição</label>
-            <textarea
-              placeholder="Descrição da chapa"
-              value={form.descricao}
-              onChange={e => setForm({ ...form, descricao: e.target.value })}
-              style={{ ...inputStyle, height: '80px', resize: 'none' }}
-            />
-          </div>
-
-          {erro && (
-            <div style={{
-              backgroundColor: '#ff4444',
-              color: 'white',
-              padding: '10px',
-              borderRadius: '6px',
-              marginBottom: '15px',
-              fontSize: '14px'
-            }}>
-              {erro}
+          <form onSubmit={handleSubmit} className="card" style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+            <div className="form-group">
+              <label className="form-label" style={{ color: '#0F172A' }}>Eleição</label>
+              <select
+                className="form-select"
+                value={form.eleicao_id}
+                onChange={e => setForm({ ...form, eleicao_id: Number(e.target.value) })}
+                required
+              >
+                <option value={0}>Selecione uma eleição</option>
+                {eleicoes.map(e => (
+                  <option key={e.id} value={e.id}>{e.titulo}</option>
+                ))}
+              </select>
             </div>
-          )}
 
-          {sucesso && (
-            <div style={{
-              backgroundColor: '#1a7a1a',
-              color: 'white',
-              padding: '10px',
-              borderRadius: '6px',
-              marginBottom: '15px',
-              fontSize: '14px'
-            }}>
-              {sucesso}
+            <div className="form-group">
+              <label className="form-label" style={{ color: '#0F172A' }}>Nome da chapa</label>
+              <input
+                className="form-input"
+                type="text"
+                placeholder="Nome da chapa"
+                value={form.nome}
+                onChange={e => setForm({ ...form, nome: e.target.value })}
+                required
+              />
             </div>
-          )}
 
-          <div style={{ display: 'flex', gap: '10px', marginBottom: '30px' }}>
-            <button
-              type="submit"
-              disabled={carregando}
-              style={{
-                flex: 1,
-                padding: '14px',
-                backgroundColor: '#e6a817',
-                color: 'white',
-                border: 'none',
-                borderRadius: '6px',
-                fontSize: '15px',
-                fontWeight: 'bold',
-                cursor: 'pointer'
-              }}
-            >
-              {carregando ? 'Salvando...' : editando ? 'Atualizar' : 'Cadastrar'}
-            </button>
-            <button
-              type="button"
-              onClick={() => navigate('/admin')}
-              style={{
-                flex: 1,
-                padding: '14px',
-                backgroundColor: '#8a1a1a',
-                color: 'white',
-                border: 'none',
-                borderRadius: '6px',
-                fontSize: '15px',
-                cursor: 'pointer'
-              }}
-            >
-              Voltar
-            </button>
-          </div>
-        </form>
+            <div className="form-group">
+              <label className="form-label" style={{ color: '#0F172A' }}>Número (2 dígitos)</label>
+              <input
+                className="form-input"
+                type="text"
+                placeholder="Ex: 01"
+                maxLength={2}
+                value={form.numero}
+                onChange={e => setForm({ ...form, numero: e.target.value })}
+                required
+              />
+            </div>
 
-        {/* Lista chapas */}
-        <h3 style={{ color: 'white', marginBottom: '15px' }}>
-          Chapas cadastradas
-        </h3>
+            <div className="form-group">
+              <label className="form-label" style={{ color: '#0F172A' }}>URL da foto</label>
+              <input
+                className="form-input"
+                type="text"
+                placeholder="https://..."
+                value={form.foto_url}
+                onChange={e => setForm({ ...form, foto_url: e.target.value })}
+              />
+            </div>
 
-        {chapas.length === 0 ? (
-          <p style={{ color: '#ccc' }}>Nenhuma chapa cadastrada ainda.</p>
-        ) : (
-          chapas.map(chapa => (
-            <div
-              key={chapa.id}
-              style={{
-                backgroundColor: '#1a2a8a',
-                padding: '15px',
-                borderRadius: '8px',
-                marginBottom: '12px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px'
-              }}
-            >
-              {chapa.foto_url ? (
-                <img
-                  src={chapa.foto_url}
-                  alt={chapa.nome}
+            <div className="form-group">
+              <label className="form-label" style={{ color: '#0F172A' }}>Descrição</label>
+              <textarea
+                className="form-textarea"
+                placeholder="Descrição da chapa"
+                value={form.descricao}
+                onChange={e => setForm({ ...form, descricao: e.target.value })}
+                style={{ height: '100px' }}
+              />
+            </div>
+
+            {erro && (
+              <div className="alert-box error">{erro}</div>
+            )}
+
+            {sucesso && (
+              <div className="alert-box success">{sucesso}</div>
+            )}
+
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+              <button type="submit" disabled={carregando} className="button-primary button-block" style={{ opacity: carregando ? 0.75 : 1 }}>
+                {carregando ? 'Salvando...' : editando ? 'Atualizar' : 'Cadastrar'}
+              </button>
+              <button type="button" onClick={() => navigate('/admin')} className="button-secondary button-block" style={{ backgroundColor: '#8A1A1A' }}>
+                Voltar
+              </button>
+            </div>
+          </form>
+
+          <div>
+            <h3 className="page-title" style={{ fontSize: '20px', marginTop: '24px' }}>Chapas cadastradas</h3>
+            {chapas.length === 0 ? (
+              <p style={{ color: '#475569' }}>Nenhuma chapa cadastrada ainda.</p>
+            ) : (
+              chapas.map(chapa => (
+                <div
+                  key={chapa.id}
+                  className="card"
                   style={{
-                    width: '55px',
-                    height: '55px',
-                    borderRadius: '50%',
-                    objectFit: 'cover'
+                    backgroundColor: '#1A2A8A',
+                    marginBottom: '14px'
                   }}
-                />
-              ) : (
-                <div style={{
-                  width: '55px',
-                  height: '55px',
-                  borderRadius: '50%',
-                  backgroundColor: '#0D1B6E',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#ccc',
-                  fontSize: '22px'
-                }}>
-                  👤
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                    <div>
+                      <h4 style={{ color: 'white', margin: 0, fontSize: '17px' }}>{chapa.nome}</h4>
+                      <p style={{ color: '#CBD5E1', marginTop: '6px', fontSize: '13px' }}>
+                        Eleição: {eleicoes.find(e => e.id === chapa.eleicao_id)?.titulo || 'Não informado'}
+                      </p>
+                    </div>
+                    <span className="status-badge" style={{ backgroundColor: '#8A1A1A' }}>{chapa.numero}</span>
+                  </div>
+
+                  <p style={{ color: '#ccc', marginBottom: '12px', fontSize: '13px' }}>{chapa.descricao || 'Sem descrição'}</p>
+
+                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                    <button
+                      onClick={() => handleEditar(chapa)}
+                      className="button-secondary"
+                      style={{ backgroundColor: '#E6A817', color: '#000', flex: 1, minWidth: '120px' }}
+                    >
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => handleDeletar(chapa.id)}
+                      className="button-secondary"
+                      style={{ backgroundColor: '#8A1A1A', flex: 1, minWidth: '120px' }}
+                    >
+                      Deletar
+                    </button>
+                  </div>
                 </div>
-              )}
-
-              <div style={{ flex: 1 }}>
-                <p style={{ color: 'white', margin: '0 0 3px 0', fontWeight: 'bold' }}>
-                  {chapa.nome}
-                </p>
-                <p style={{ color: '#ccc', margin: 0, fontSize: '13px' }}>
-                  Número: {chapa.numero}
-                </p>
-              </div>
-
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <button
-                  onClick={() => handleEditar(chapa)}
-                  style={{
-                    padding: '8px 12px',
-                    backgroundColor: '#e6a817',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    fontSize: '13px'
-                  }}
-                >
-                  Editar
-                </button>
-                <button
-                  onClick={() => handleDeletar(chapa.id)}
-                  style={{
-                    padding: '8px 12px',
-                    backgroundColor: '#8a1a1a',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    fontSize: '13px'
-                  }}
-                >
-                  Deletar
-                </button>
-              </div>
-            </div>
-          ))
-        )}
+              ))
+            )}
+          </div>
+        </div>
       </div>
     </div>
   )

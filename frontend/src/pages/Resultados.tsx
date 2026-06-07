@@ -11,15 +11,32 @@ export default function Resultados() {
   const [carregando, setCarregando] = useState(true)
 
   useEffect(() => {
-    Promise.all([
-      eleicaoService.resultado(Number(eleicaoId)),
-      eleicaoService.buscar(Number(eleicaoId))
-    ]).then(([r, e]) => {
-      setResultados(r)
-      setEleicao(e)
-    }).catch(console.error)
-    .finally(() => setCarregando(false))
-  }, [])
+    let interval: number | undefined
+
+    const carregar = async () => {
+      try {
+        const [r, e] = await Promise.all([
+          eleicaoService.resultado(Number(eleicaoId)),
+          eleicaoService.buscar(Number(eleicaoId))
+        ])
+        setResultados(r)
+        setEleicao(e)
+      } catch (err) {
+        console.error(err)
+      } finally {
+        setCarregando(false)
+      }
+    }
+
+    carregar()
+    interval = window.setInterval(carregar, 15000)
+
+    return () => {
+      if (interval) {
+        clearInterval(interval)
+      }
+    }
+  }, [eleicaoId])
 
   const totalVotos = resultados.reduce((acc, r) => acc + r.total_votos, 0)
   const encerrada = eleicao?.status === 'encerrada'

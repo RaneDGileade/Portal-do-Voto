@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { authService } from '../services/api'
 
@@ -14,6 +14,8 @@ export default function Cadastro() {
     instituicao_id: 1,
     dataNascimento: ''
   })
+  const [animCounter, setAnimCounter] = useState(0)
+  const formRef = useRef<HTMLFormElement | null>(null)
   const [erro, setErro] = useState('')
   const [carregando, setCarregando] = useState(false)
 
@@ -34,6 +36,20 @@ export default function Cadastro() {
       setCarregando(false)
     }
   }
+
+  useEffect(() => {
+    setAnimCounter(c => c + 1)
+  }, [tipo])
+
+  useEffect(() => {
+    const root = formRef.current
+    if (!root) return
+    const nodes = Array.from(root.querySelectorAll<HTMLElement>('.slide-in'))
+    if (nodes.length === 0) return
+    nodes.forEach(n => { n.style.animation = 'none' })
+    void root.offsetHeight
+    nodes.forEach(n => { n.style.animation = '' })
+  }, [animCounter])
 
   return (
     <div style={{
@@ -70,10 +86,10 @@ export default function Cadastro() {
         </label>
       </div>
 
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      <form ref={formRef} onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
         {/* Nome */}
-        <div>
+        <div className="slide-in delay-0">
           <label style={{ color: 'white', fontSize: '16px', display: 'block', marginBottom: '8px' }}>nome</label>
           <input
             className="input-field"
@@ -86,7 +102,7 @@ export default function Cadastro() {
 
         {/* Data nascimento — só admin */}
         {tipo === 'admin' && (
-          <div className="slide-in">
+          <div className="slide-in delay-1" key={`admin-date-${animCounter}`}>
             <label style={{ color: 'white', fontSize: '16px', display: 'block', marginBottom: '8px' }}>dd/mm/aaaa</label>
             <input
               className="input-field"
@@ -98,7 +114,7 @@ export default function Cadastro() {
         )}
 
         {/* Email */}
-        <div>
+        <div className="slide-in delay-2">
           <label style={{ color: 'white', fontSize: '16px', display: 'block', marginBottom: '8px' }}>email</label>
           <input
             className="input-field"
@@ -111,14 +127,14 @@ export default function Cadastro() {
 
         {/* Nome da instituição — só admin */}
         {tipo === 'admin' && (
-          <div className="slide-in">
+          <div className="slide-in delay-3" key={`admin-inst-${animCounter}`}>
             <label style={{ color: 'white', fontSize: '16px', display: 'block', marginBottom: '8px' }}>nome da instituição</label>
             <input className="input-field" type="text" />
           </div>
         )}
 
         {/* Senha */}
-        <div>
+        <div className="slide-in delay-4">
           <label style={{ color: 'white', fontSize: '16px', display: 'block', marginBottom: '8px' }}>senha</label>
           <input
             className="input-field"
@@ -130,7 +146,7 @@ export default function Cadastro() {
         </div>
 
         {/* Confirmar senha */}
-        <div>
+        <div className="slide-in delay-5">
           <label style={{ color: 'white', fontSize: '16px', display: 'block', marginBottom: '8px' }}>confirme a senha</label>
           <input
             className="input-field"

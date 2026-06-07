@@ -81,250 +81,136 @@ export default function Eleicoes() {
     return '#8a6a1a'
   }
 
-  const inputStyle = {
-    width: '100%',
-    padding: '12px',
-    borderRadius: '6px',
-    border: 'none',
-    backgroundColor: '#1a2a8a',
-    color: 'white',
-    fontSize: '14px',
-    boxSizing: 'border-box' as const
-  }
-
-  const labelStyle = {
-    color: 'white',
-    fontSize: '14px',
-    display: 'block',
-    marginBottom: '5px'
-  }
-
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#0D1B6E', padding: '0' }}>
-      {/* Header */}
-      <div style={{
-        backgroundColor: '#0a1560',
-        padding: '15px 20px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center'
-      }}>
-        <h1 style={{ color: 'white', fontSize: '20px', margin: 0 }}>
-          Portal Do <span style={{ color: '#FF4500' }}>Voto</span>
-        </h1>
+    <div className="page-shell">
+      <div className="page-header">
+        <h1>Portal Do <span>Voto</span></h1>
       </div>
 
-      <div style={{ padding: '20px' }}>
-        <h2 style={{ color: 'white', fontSize: '18px', marginBottom: '20px' }}>
-          {editando ? 'Editar eleição' : 'Criar eleição'}
-        </h2>
+      <div className="page-card">
+        <div className="page-card-center">
+          <h2 className="page-title">{editando ? 'Editar eleição' : 'Criar eleição'}</h2>
 
-        {/* Formulário */}
-        <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '15px' }}>
-            <label style={labelStyle}>Nome da eleição</label>
-            <input
-              type="text"
-              placeholder="Nome da eleição"
-              value={form.titulo}
-              onChange={e => setForm({ ...form, titulo: e.target.value })}
-              style={inputStyle}
-              required
-            />
-          </div>
-
-          <div style={{ marginBottom: '15px' }}>
-            <label style={labelStyle}>Início</label>
-            <input
-              type="datetime-local"
-              value={form.inicio}
-              onChange={e => setForm({ ...form, inicio: e.target.value })}
-              style={inputStyle}
-              required
-            />
-          </div>
-
-          <div style={{ marginBottom: '15px' }}>
-            <label style={labelStyle}>Fim</label>
-            <input
-              type="datetime-local"
-              value={form.fim}
-              onChange={e => setForm({ ...form, fim: e.target.value })}
-              style={inputStyle}
-              required
-            />
-          </div>
-
-          <div style={{ marginBottom: '20px' }}>
-            <label style={labelStyle}>Status</label>
-            <select
-              value={form.status}
-              onChange={e => setForm({ ...form, status: e.target.value })}
-              style={inputStyle}
-            >
-              <option value="rascunho">Rascunho</option>
-              <option value="ativa">Ativa</option>
-              <option value="encerrada">Encerrada</option>
-            </select>
-          </div>
-
-          {erro && (
-            <div style={{
-              backgroundColor: '#ff4444',
-              color: 'white',
-              padding: '10px',
-              borderRadius: '6px',
-              marginBottom: '15px',
-              fontSize: '14px'
-            }}>
-              {erro}
+          <form onSubmit={handleSubmit} className="card" style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+            <div className="form-group">
+              <label className="form-label" style={{ color: '#0F172A' }}>Nome da eleição</label>
+              <input
+                className="form-input"
+                type="text"
+                placeholder="Nome da eleição"
+                value={form.titulo}
+                onChange={e => setForm({ ...form, titulo: e.target.value })}
+                required
+              />
             </div>
-          )}
 
-          {sucesso && (
-            <div style={{
-              backgroundColor: '#1a7a1a',
-              color: 'white',
-              padding: '10px',
-              borderRadius: '6px',
-              marginBottom: '15px',
-              fontSize: '14px'
-            }}>
-              {sucesso}
+            <div className="form-group">
+              <label className="form-label" style={{ color: '#0F172A' }}>Início</label>
+              <input
+                className="form-input"
+                type="datetime-local"
+                value={form.inicio}
+                onChange={e => setForm({ ...form, inicio: e.target.value })}
+                required
+              />
             </div>
-          )}
 
-          <div style={{ display: 'flex', gap: '10px', marginBottom: '30px' }}>
-            <button
-              type="submit"
-              disabled={carregando}
-              style={{
-                flex: 1,
-                padding: '14px',
-                backgroundColor: '#1a7a1a',
-                color: 'white',
-                border: 'none',
-                borderRadius: '6px',
-                fontSize: '15px',
-                fontWeight: 'bold',
-                cursor: 'pointer'
-              }}
-            >
-              {carregando ? 'Salvando...' : editando ? 'Salvar' : 'Criar eleição'}
-            </button>
-            <button
-              type="button"
-              onClick={() => navigate('/admin')}
-              style={{
-                flex: 1,
-                padding: '14px',
-                backgroundColor: '#8a1a1a',
-                color: 'white',
-                border: 'none',
-                borderRadius: '6px',
-                fontSize: '15px',
-                cursor: 'pointer'
-              }}
-            >
-              Voltar
-            </button>
-          </div>
-        </form>
+            <div className="form-group">
+              <label className="form-label" style={{ color: '#0F172A' }}>Fim</label>
+              <input
+                className="form-input"
+                type="datetime-local"
+                value={form.fim}
+                onChange={e => setForm({ ...form, fim: e.target.value })}
+                required
+              />
+            </div>
 
-        {/* Lista eleições */}
-        <h3 style={{ color: 'white', marginBottom: '15px' }}>
-          Eleições ativas
-        </h3>
+            <div className="form-group">
+              <label className="form-label" style={{ color: '#0F172A' }}>Status</label>
+              <select
+                className="form-select"
+                value={form.status}
+                onChange={e => setForm({ ...form, status: e.target.value })}
+              >
+                <option value="rascunho">Rascunho</option>
+                <option value="ativa">Ativa</option>
+                <option value="encerrada">Encerrada</option>
+              </select>
+            </div>
 
-        {eleicoes.length === 0 ? (
-          <p style={{ color: '#ccc' }}>Nenhuma eleição criada ainda.</p>
-        ) : (
-          eleicoes.map(eleicao => (
-            <div
-              key={eleicao.id}
-              style={{
-                backgroundColor: '#1a2a8a',
-                padding: '15px',
-                borderRadius: '8px',
-                marginBottom: '12px',
-                borderLeft: `4px solid ${corStatus(eleicao.status)}`
-              }}
-            >
-              <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'flex-start',
-                marginBottom: '8px'
-              }}>
-                <h4 style={{ color: 'white', margin: 0, fontSize: '15px' }}>
-                  {eleicao.titulo}
-                </h4>
-                <span style={{
-                  backgroundColor: corStatus(eleicao.status),
-                  color: 'white',
-                  padding: '3px 10px',
-                  borderRadius: '12px',
-                  fontSize: '12px'
-                }}>
-                  {eleicao.status}
-                </span>
-              </div>
+            {erro && (
+              <div className="alert-box error">{erro}</div>
+            )}
 
-              <p style={{ color: '#ccc', margin: '0 0 12px 0', fontSize: '13px' }}>
-                {new Date(eleicao.inicio).toLocaleDateString('pt-BR')} →{' '}
-                {new Date(eleicao.fim).toLocaleDateString('pt-BR')}
-              </p>
+            {sucesso && (
+              <div className="alert-box success">{sucesso}</div>
+            )}
 
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <button
-                  onClick={() => handleEditar(eleicao)}
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+              <button type="submit" disabled={carregando} className="button-primary button-block" style={{ opacity: carregando ? 0.75 : 1 }}>
+                {carregando ? 'Salvando...' : editando ? 'Salvar' : 'Criar eleição'}
+              </button>
+              <button type="button" onClick={() => navigate('/admin')} className="button-secondary button-block" style={{ backgroundColor: '#8A1A1A' }}>
+                Voltar
+              </button>
+            </div>
+          </form>
+
+          <div>
+            <h3 className="page-title" style={{ fontSize: '20px', marginTop: '24px' }}>Eleições</h3>
+            {eleicoes.length === 0 ? (
+              <p style={{ color: '#475569' }}>Nenhuma eleição criada ainda.</p>
+            ) : (
+              eleicoes.map(eleicao => (
+                <div
+                  key={eleicao.id}
+                  className="card"
                   style={{
-                    flex: 1,
-                    padding: '8px',
-                    backgroundColor: '#e6a817',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    fontSize: '13px'
+                    backgroundColor: '#1A2A8A',
+                    marginBottom: '14px',
+                    borderLeft: `4px solid ${corStatus(eleicao.status)}`
                   }}
                 >
-                  Editar
-                </button>
-                <button
-                  onClick={() => handleDeletar(eleicao.id)}
-                  style={{
-                    flex: 1,
-                    padding: '8px',
-                    backgroundColor: '#8a1a1a',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    fontSize: '13px'
-                  }}
-                >
-                  Deletar
-                </button>
-                <button
-                  onClick={() => navigate(`/resultados/${eleicao.id}`)}
-                  style={{
-                    flex: 1,
-                    padding: '8px',
-                    backgroundColor: '#1a5a8a',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    fontSize: '13px'
-                  }}
-                >
-                  Resultados
-                </button>
-              </div>
-            </div>
-          ))
-        )}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                    <div>
+                      <h4 style={{ color: 'white', margin: 0, fontSize: '17px' }}>{eleicao.titulo}</h4>
+                      <p style={{ color: '#CBD5E1', marginTop: '6px', fontSize: '13px' }}>
+                        {new Date(eleicao.inicio).toLocaleDateString('pt-BR')} →{' '}
+                        {new Date(eleicao.fim).toLocaleDateString('pt-BR')}
+                      </p>
+                    </div>
+                    <span className="status-badge" style={{ backgroundColor: corStatus(eleicao.status) }}>{eleicao.status}</span>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '10px' }}>
+                    <button
+                      onClick={() => handleEditar(eleicao)}
+                      className="button-secondary"
+                      style={{ backgroundColor: '#E6A817', color: '#000', flex: 1, minWidth: '140px' }}
+                    >
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => handleDeletar(eleicao.id)}
+                      className="button-secondary"
+                      style={{ backgroundColor: '#8A1A1A', flex: 1, minWidth: '140px' }}
+                    >
+                      Deletar
+                    </button>
+                    <button
+                      onClick={() => navigate(`/resultados/${eleicao.id}`)}
+                      className="button-secondary"
+                      style={{ backgroundColor: '#1A5A8A', flex: 1, minWidth: '140px' }}
+                    >
+                      Resultados
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
       </div>
     </div>
   )

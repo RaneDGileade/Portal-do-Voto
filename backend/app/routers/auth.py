@@ -12,14 +12,16 @@ router = APIRouter()
 
 @router.post("/login", response_model=schemas.Token)
 def login(dados: schemas.Login, db: Session = Depends(get_db)):
+    # Busca usuário por nome e tipo
     usuario = db.query(models.Usuario).filter(
-        models.Usuario.matricula == dados.matricula
+        models.Usuario.nome == dados.nome,
+        models.Usuario.tipo == dados.tipo
     ).first()
 
     if not usuario or not verificar_senha(dados.senha, usuario.senha_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Matrícula ou senha inválidas"
+            detail="Nome ou senha inválidos"
         )
 
     if not usuario.ativo:
@@ -27,6 +29,30 @@ def login(dados: schemas.Login, db: Session = Depends(get_db)):
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Usuário inativo"
         )
+
+    # Validação adicional para usuários comuns (verificar eleição)
+    if dados.tipo == "usuario" and dados.nomeEleicao:
+        from ..routers import eleicoes as eleicoes_router
+        eleicoes = db.query(models.Eleicao).filter(
+            models.Eleicao.titulo.ilike(f"%{dados.nomeEleicao}%")
+        ).all()
+        if not eleicoes:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Eleição não encontrada"
+            )
+
+    # Validação adicional para admins (verificar instituição)
+    if dados.tipo == "admin" and dados.nomeInstituicao:
+        from .. import models as models_module
+        instituicao = db.query(models_module.Instituicao).filter(
+            models_module.Instituicao.nome.ilike(f"%{dados.nomeInstituicao}%")
+        ).first()
+        if not instituicao or instituicao.id != usuario.instituicao_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Instituição não corresponde ao usuário"
+            )
 
     token = criar_token({"sub": usuario.matricula})
     return {

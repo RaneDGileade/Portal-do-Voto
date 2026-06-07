@@ -1,19 +1,43 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { authService } from '../services/api'
+import { authService, eleicaoService } from '../services/api'
 
 export default function Login() {
   const navigate = useNavigate()
   const [tipo, setTipo] = useState<'admin' | 'usuario'>('usuario')
   const [form, setForm] = useState({ matricula: '', senha: '', nomeEleicao: '' })
+  const [animCounter, setAnimCounter] = useState(0)
   const [erro, setErro] = useState('')
   const [carregando, setCarregando] = useState(false)
+  const formRef = useRef<HTMLFormElement | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setErro('')
     setCarregando(true)
     try {
+      if (tipo === 'usuario') {
+        if (!form.nomeEleicao.trim()) {
+          setErro('Informe o nome da eleição')
+          setCarregando(false)
+          return
+        }
+
+        const eleicoes = await eleicaoService.buscarPorTitulo(form.nomeEleicao.trim())
+        if (!eleicoes || eleicoes.length === 0) {
+          setErro('Eleição não encontrada')
+          setCarregando(false)
+          return
+        }
+
+        const eleicaoSelecionada = eleicoes[0]
+        localStorage.setItem('eleicaoSelecionada', String(eleicaoSelecionada.id))
+        localStorage.setItem('eleicaoSelecionadaTitulo', eleicaoSelecionada.titulo)
+      } else {
+        localStorage.removeItem('eleicaoSelecionada')
+        localStorage.removeItem('eleicaoSelecionadaTitulo')
+      }
+
       const data = await authService.login({ matricula: form.matricula, senha: form.senha })
       localStorage.setItem('token', data.access_token)
       localStorage.setItem('usuario', JSON.stringify(data.usuario))
@@ -28,6 +52,24 @@ export default function Login() {
       setCarregando(false)
     }
   }
+
+  useEffect(() => {
+    // increment counter to force remount of dynamic input wrapper and replay animation
+    setAnimCounter(c => c + 1)
+  }, [tipo])
+
+  useEffect(() => {
+    const root = formRef.current
+    if (!root) return
+    const nodes = Array.from(root.querySelectorAll<HTMLElement>('.slide-in'))
+    if (nodes.length === 0) return
+
+    // remove animation inline style to force restart, then reflow and restore
+    nodes.forEach(n => { n.style.animation = 'none' })
+    // force reflow
+    void root.offsetHeight
+    nodes.forEach(n => { n.style.animation = '' })
+  }, [animCounter])
 
   return (
     <div style={{
@@ -57,10 +99,10 @@ export default function Login() {
         </label>
       </div>
 
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
+      <form ref={formRef} onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
 
         {/* Campo Nome */}
-        <div className="slide-in" key={tipo}>
+        <div className="slide-in delay-0" key={tipo}>
           <label style={{ color: 'white', fontSize: '16px', display: 'block', marginBottom: '8px' }}>
             nome
           </label>
@@ -75,14 +117,14 @@ export default function Login() {
 
         {/* Campo dinâmico por tipo */}
         {tipo === 'admin' ? (
-          <div className="slide-in">
+          <div className="slide-in delay-1" key={`dynamic-${tipo}-${animCounter}`}>
             <label style={{ color: 'white', fontSize: '16px', display: 'block', marginBottom: '8px' }}>
               nome da instituição
             </label>
             <input className="input-field" type="text" />
           </div>
         ) : (
-          <div className="slide-in">
+          <div className="slide-in delay-1" key={`dynamic-${tipo}-${animCounter}`}>
             <label style={{ color: 'white', fontSize: '16px', display: 'block', marginBottom: '8px' }}>
               nome da eleição
             </label>
@@ -91,12 +133,13 @@ export default function Login() {
               type="text"
               value={form.nomeEleicao}
               onChange={e => setForm({ ...form, nomeEleicao: e.target.value })}
+              required
             />
           </div>
         )}
 
         {/* Senha */}
-        <div>
+        <div className="slide-in delay-2" key="senha-field">
           <label style={{ color: 'white', fontSize: '16px', display: 'block', marginBottom: '8px' }}>
             senha
           </label>

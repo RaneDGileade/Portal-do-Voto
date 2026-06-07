@@ -107,8 +107,11 @@ class Voto(BaseModel):
 
 # Auth
 class Login(BaseModel):
-    matricula: str
+    nome: str
     senha: str
+    tipo: str = "usuario"  # 'usuario' or 'admin'
+    nomeEleicao: Optional[str] = None  # para usuario
+    nomeInstituicao: Optional[str] = None  # para admin
 
 class Token(BaseModel):
     access_token: str
