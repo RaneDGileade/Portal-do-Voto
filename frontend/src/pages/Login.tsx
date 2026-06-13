@@ -5,7 +5,7 @@ import { authService, eleicaoService } from '../services/api'
 export default function Login() {
   const navigate = useNavigate()
   const [tipo, setTipo] = useState<'admin' | 'usuario'>('usuario')
-  const [form, setForm] = useState({ matricula: '', senha: '', nomeEleicao: '' })
+  const [form, setForm] = useState({ nome: '', senha: '', nomeEleicao: '' })
   const [animCounter, setAnimCounter] = useState(0)
   const [erro, setErro] = useState('')
   const [carregando, setCarregando] = useState(false)
@@ -16,13 +16,7 @@ export default function Login() {
     setErro('')
     setCarregando(true)
     try {
-      if (tipo === 'usuario') {
-        if (!form.nomeEleicao.trim()) {
-          setErro('Informe o nome da eleição')
-          setCarregando(false)
-          return
-        }
-
+      if (tipo === 'usuario' && form.nomeEleicao.trim()) {
         const eleicoes = await eleicaoService.buscarPorTitulo(form.nomeEleicao.trim())
         if (!eleicoes || eleicoes.length === 0) {
           setErro('Eleição não encontrada')
@@ -33,12 +27,14 @@ export default function Login() {
         const eleicaoSelecionada = eleicoes[0]
         localStorage.setItem('eleicaoSelecionada', String(eleicaoSelecionada.id))
         localStorage.setItem('eleicaoSelecionadaTitulo', eleicaoSelecionada.titulo)
-      } else {
+      } else if (tipo === 'admin') {
         localStorage.removeItem('eleicaoSelecionada')
         localStorage.removeItem('eleicaoSelecionadaTitulo')
       }
 
-      const data = await authService.login({ matricula: form.matricula, senha: form.senha })
+      // Mapeia 'usuario' para 'eleitor' conforme banco de dados
+      const tipoLogin = tipo === 'usuario' ? 'eleitor' : 'admin'
+      const data = await authService.login({ nome: form.nome, senha: form.senha, tipo: tipoLogin })
       localStorage.setItem('token', data.access_token)
       localStorage.setItem('usuario', JSON.stringify(data.usuario))
       if (data.usuario.tipo === 'admin') {
@@ -109,8 +105,8 @@ export default function Login() {
           <input
             className="input-field"
             type="text"
-            value={form.matricula}
-            onChange={e => setForm({ ...form, matricula: e.target.value })}
+            value={form.nome}
+            onChange={e => setForm({ ...form, nome: e.target.value })}
             required
           />
         </div>
@@ -126,14 +122,13 @@ export default function Login() {
         ) : (
           <div className="slide-in delay-1" key={`dynamic-${tipo}-${animCounter}`}>
             <label style={{ color: 'white', fontSize: '16px', display: 'block', marginBottom: '8px' }}>
-              nome da eleição
+              nome da eleição (opcional)
             </label>
             <input
               className="input-field"
               type="text"
               value={form.nomeEleicao}
               onChange={e => setForm({ ...form, nomeEleicao: e.target.value })}
-              required
             />
           </div>
         )}

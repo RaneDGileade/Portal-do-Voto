@@ -61,8 +61,10 @@ export interface ResultadoChapa {
 }
 
 export interface LoginForm {
-  matricula: string
+  nome: string
   senha: string
+  tipo?: 'eleitor' | 'admin'
+  nomeEleicao?: string
 }
 
 export interface CadastroForm {
