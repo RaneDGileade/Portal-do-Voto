@@ -8,23 +8,25 @@ interface SidebarProps {
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const navigate = useNavigate()
   const usuario = JSON.parse(localStorage.getItem('usuario') || '{}')
+  const isAdmin = usuario.tipo === 'admin'
 
   const handleSair = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('usuario')
+    localStorage.removeItem('eleicaoSelecionada')
+    localStorage.removeItem('eleicaoSelecionadaTitulo')
     onClose()
-    navigate('/')
+    navigate('/login')
   }
 
   return (
     <>
       <div className={`sidebar-overlay ${isOpen ? 'open' : ''}`} onClick={onClose} />
       <div className={`sidebar ${isOpen ? 'open' : ''}`}>
-        <div style={{ marginBottom: '40px' }}>
-          <h2 style={{ color: 'white', fontSize: '22px', fontWeight: '700', marginBottom: '8px' }}>
-            Portal Do <span style={{ color: '#FF3D00' }}>Voto</span>
-          </h2>
-        </div>
+
+        <h2 style={{ color: 'white', fontSize: '20px', fontWeight: '700', marginBottom: '36px' }}>
+          Portal Do <span style={{ color: '#FF3D00' }}>Voto</span>
+        </h2>
 
         <div style={{
           backgroundColor: '#1a2a8a',
@@ -33,35 +35,31 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           marginBottom: '30px'
         }}>
           <div style={{
-            width: '60px',
-            height: '60px',
+            width: '52px', height: '52px',
             borderRadius: '50%',
-            backgroundColor: '#FF3D00',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            backgroundColor: isAdmin ? '#FF3D00' : '#2B6CB0',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
             marginBottom: '12px',
-            fontSize: '28px',
-            color: 'white',
-            fontWeight: '700'
+            fontSize: '24px', color: 'white', fontWeight: '700'
           }}>
             {usuario.nome?.charAt(0).toUpperCase() || '?'}
           </div>
-          <p style={{ color: 'white', fontWeight: '700', fontSize: '16px', marginBottom: '4px' }}>
+          <p style={{ color: 'white', fontWeight: '700', fontSize: '15px', margin: '0 0 4px' }}>
             {usuario.nome || 'Usuário'}
           </p>
-          <p style={{ color: '#ccc', fontSize: '13px', marginBottom: '4px' }}>
+          <p style={{ color: '#aab4d4', fontSize: '12px', margin: '0 0 10px', wordBreak: 'break-all' }}>
             {usuario.email || ''}
           </p>
           <span style={{
-            backgroundColor: usuario.tipo === 'admin' ? '#FF3D00' : '#1a7a1a',
+            display: 'inline-block',
+            backgroundColor: isAdmin ? '#FF3D00' : '#1a7a1a',
             color: 'white',
             padding: '3px 12px',
             borderRadius: '20px',
-            fontSize: '12px',
-            fontWeight: '600'
+            fontSize: '11px',
+            fontWeight: '700'
           }}>
-            {usuario.tipo === 'admin' ? 'Administrador' : 'Eleitor'}
+            {isAdmin ? 'Administrador' : 'Eleitor'}
           </span>
         </div>
 
@@ -70,16 +68,11 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         <button
           onClick={handleSair}
           style={{
-            width: '100%',
-            padding: '16px',
-            backgroundColor: '#FF3D00',
-            color: 'white',
-            border: 'none',
-            borderRadius: '12px',
-            fontSize: '16px',
-            fontWeight: '600',
-            cursor: 'pointer',
-            fontFamily: 'Poppins, sans-serif'
+            width: '100%', padding: '14px',
+            backgroundColor: '#FF3D00', color: 'white',
+            border: 'none', borderRadius: '12px',
+            fontSize: '15px', fontWeight: '700',
+            cursor: 'pointer', fontFamily: 'Poppins, sans-serif'
           }}
         >
           Sair

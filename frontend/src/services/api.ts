@@ -146,6 +146,11 @@ export const votoService = {
     const response = await api.get(`/votos/meu-voto/${eleicao_id}`)
     return response.data
   },
+
+  listarParticipadas: async () => {
+    const response = await api.get('/votos/participadas')
+    return response.data
+  },
 }
 
 // Admin

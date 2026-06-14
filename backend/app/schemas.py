@@ -20,11 +20,10 @@ class Instituicao(InstituicaoBase):
 
 # Usuário
 class UsuarioBase(BaseModel):
-    matricula: str
     nome: str
     email: EmailStr
     tipo: str = "eleitor"
-    instituicao_id: int
+    instituicao_id: Optional[int] = None
 
 class UsuarioCreate(UsuarioBase):
     senha: str
@@ -109,9 +108,8 @@ class Voto(BaseModel):
 class Login(BaseModel):
     nome: str
     senha: str
-    tipo: str = "usuario"  # 'usuario' or 'admin'
-    nomeEleicao: Optional[str] = None  # para usuario
-    nomeInstituicao: Optional[str] = None  # para admin
+    tipo: str = "usuario"
+    nomeEleicao: Optional[str] = None
 
 class Token(BaseModel):
     access_token: str

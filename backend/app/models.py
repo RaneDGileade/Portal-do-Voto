@@ -19,13 +19,12 @@ class Usuario(Base):
     __tablename__ = "usuarios"
 
     id = Column(Integer, primary_key=True, index=True)
-    matricula = Column(String, unique=True, nullable=False, index=True)
     nome = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
     senha_hash = Column(String, nullable=False)
     tipo = Column(String, default="eleitor")
     ativo = Column(Boolean, default=True)
-    instituicao_id = Column(Integer, ForeignKey("instituicoes.id"), nullable=False)
+    instituicao_id = Column(Integer, ForeignKey("instituicoes.id"), nullable=True)
     criado_em = Column(DateTime(timezone=True), server_default=func.now())
 
     instituicao = relationship("Instituicao", back_populates="usuarios")

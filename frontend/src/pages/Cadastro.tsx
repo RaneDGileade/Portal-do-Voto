@@ -6,12 +6,10 @@ export default function Cadastro() {
   const navigate = useNavigate()
   const [tipo, setTipo] = useState<'admin' | 'eleitor'>('eleitor')
   const [form, setForm] = useState({
-    matricula: '',
     nome: '',
     email: '',
     senha: '',
     confirmar_senha: '',
-    instituicao_id: 1,
     dataNascimento: ''
   })
   const [animCounter, setAnimCounter] = useState(0)
@@ -28,7 +26,7 @@ export default function Cadastro() {
     }
     setCarregando(true)
     try {
-      await authService.cadastro({ ...form, tipo })
+      await authService.cadastro({ nome: form.nome, email: form.email, senha: form.senha, confirmar_senha: form.confirmar_senha, tipo })
       navigate('/login')
     } catch (err: any) {
       setErro(err.response?.data?.detail || 'Erro ao cadastrar')
@@ -45,14 +43,13 @@ export default function Cadastro() {
     const root = formRef.current
     if (!root) return
     const nodes = Array.from(root.querySelectorAll<HTMLElement>('.slide-in'))
-    if (nodes.length === 0) return
     nodes.forEach(n => { n.style.animation = 'none' })
     void root.offsetHeight
     nodes.forEach(n => { n.style.animation = '' })
   }, [animCounter])
 
   return (
-    <div style={{
+    <div className="auth-page" style={{
       minHeight: '100vh',
       backgroundColor: '#0D1B6E',
       display: 'flex',
@@ -63,25 +60,14 @@ export default function Cadastro() {
         Cadastre-se
       </h2>
 
-      {/* Tipo conta */}
-      <p style={{ color: 'white', fontSize: '16px', marginBottom: '12px' }}>tipo do conta:</p>
+      <p style={{ color: 'white', fontSize: '16px', marginBottom: '12px' }}>tipo de conta:</p>
       <div style={{ display: 'flex', gap: '30px', marginBottom: '30px' }}>
         <label className="radio-label">
-          <input
-            type="radio"
-            name="tipo"
-            checked={tipo === 'admin'}
-            onChange={() => setTipo('admin')}
-          />
+          <input type="radio" name="tipo" checked={tipo === 'admin'} onChange={() => setTipo('admin')} />
           Administrador
         </label>
         <label className="radio-label">
-          <input
-            type="radio"
-            name="tipo"
-            checked={tipo === 'eleitor'}
-            onChange={() => setTipo('eleitor')}
-          />
+          <input type="radio" name="tipo" checked={tipo === 'eleitor'} onChange={() => setTipo('eleitor')} />
           Usuário
         </label>
       </div>
@@ -95,7 +81,7 @@ export default function Cadastro() {
             className="input-field"
             type="text"
             value={form.nome}
-            onChange={e => setForm({ ...form, nome: e.target.value, matricula: e.target.value })}
+            onChange={e => setForm({ ...form, nome: e.target.value })}
             required
           />
         </div>
@@ -125,16 +111,8 @@ export default function Cadastro() {
           />
         </div>
 
-        {/* Nome da instituição — só admin */}
-        {tipo === 'admin' && (
-          <div className="slide-in delay-3" key={`admin-inst-${animCounter}`}>
-            <label style={{ color: 'white', fontSize: '16px', display: 'block', marginBottom: '8px' }}>nome da instituição</label>
-            <input className="input-field" type="text" />
-          </div>
-        )}
-
         {/* Senha */}
-        <div className="slide-in delay-4">
+        <div className="slide-in delay-3">
           <label style={{ color: 'white', fontSize: '16px', display: 'block', marginBottom: '8px' }}>senha</label>
           <input
             className="input-field"
@@ -146,7 +124,7 @@ export default function Cadastro() {
         </div>
 
         {/* Confirmar senha */}
-        <div className="slide-in delay-5">
+        <div className="slide-in delay-4">
           <label style={{ color: 'white', fontSize: '16px', display: 'block', marginBottom: '8px' }}>confirme a senha</label>
           <input
             className="input-field"

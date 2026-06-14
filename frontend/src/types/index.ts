@@ -7,12 +7,11 @@ export interface Instituicao {
 
 export interface Usuario {
   id: number
-  matricula: string
   nome: string
   email: string
   tipo: 'admin' | 'eleitor'
   ativo: boolean
-  instituicao_id: number
+  instituicao_id?: number
   criado_em: string
 }
 
@@ -68,13 +67,12 @@ export interface LoginForm {
 }
 
 export interface CadastroForm {
-  matricula: string
   nome: string
   email: string
   senha: string
   confirmar_senha: string
   tipo: 'admin' | 'eleitor'
-  instituicao_id: number
+  instituicao_id?: number
 }
 
 export interface VotoForm {

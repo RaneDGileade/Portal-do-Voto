@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { eleicaoService } from '../../services/api'
+import Sidebar from '../../components/Sidebar'
 import { Eleicao } from '../../types'
 
 export default function Eleicoes() {
@@ -17,6 +18,8 @@ export default function Eleicoes() {
   const [erro, setErro] = useState('')
   const [sucesso, setSucesso] = useState('')
   const [carregando, setCarregando] = useState(false)
+  const [sidebarAberta, setSidebarAberta] = useState(false)
+  const usuario = JSON.parse(localStorage.getItem('usuario') || '{}')
 
   useEffect(() => {
     carregarEleicoes()
@@ -85,12 +88,16 @@ export default function Eleicoes() {
     <div className="page-shell">
       <div className="page-header">
         <h1>Portal Do <span>Voto</span></h1>
+        <button onClick={() => setSidebarAberta(true)} className="profile-toggle" style={{ width: '38px', height: '38px', borderRadius: '50%', backgroundColor: '#FF3D00', color: 'white', border: 'none', cursor: 'pointer', fontSize: '16px', fontWeight: '700', fontFamily: 'Poppins, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {usuario.nome?.charAt(0).toUpperCase() || '?'}
+        </button>
       </div>
 
       <div className="page-card">
         <div className="page-card-center">
           <h2 className="page-title">{editando ? 'Editar eleição' : 'Criar eleição'}</h2>
 
+          <div className="desktop-two-col">
           <form onSubmit={handleSubmit} className="card" style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
             <div className="form-group">
               <label className="form-label" style={{ color: '#0F172A' }}>Nome da eleição</label>
@@ -158,7 +165,7 @@ export default function Eleicoes() {
           </form>
 
           <div>
-            <h3 className="page-title" style={{ fontSize: '20px', marginTop: '24px' }}>Eleições</h3>
+            <h3 className="page-title" style={{ fontSize: '20px' }}>Eleições</h3>
             {eleicoes.length === 0 ? (
               <p style={{ color: '#475569' }}>Nenhuma eleição criada ainda.</p>
             ) : (
@@ -210,8 +217,10 @@ export default function Eleicoes() {
               ))
             )}
           </div>
+          </div>{/* desktop-two-col */}
         </div>
       </div>
+      <Sidebar isOpen={sidebarAberta} onClose={() => setSidebarAberta(false)} />
     </div>
   )
 }

@@ -8,6 +8,7 @@ import Home from './pages/Home'
 import Votacao from './pages/Votacao'
 import Candidatos from './pages/Candidatos'
 import Resultados from './pages/Resultados'
+import Participadas from './pages/Participadas'
 import Dashboard from './pages/admin/Dashboard'
 import Chapas from './pages/admin/Chapas'
 import Eleicoes from './pages/admin/Eleicoes'
@@ -47,6 +48,9 @@ function App() {
         } />
         <Route path="/resultados/:eleicaoId" element={
           <RotaProtegida><Resultados /></RotaProtegida>
+        } />
+        <Route path="/participadas" element={
+          <RotaProtegida><Participadas /></RotaProtegida>
         } />
 
         <Route path="/admin" element={

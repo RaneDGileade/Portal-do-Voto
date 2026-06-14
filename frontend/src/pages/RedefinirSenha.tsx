@@ -50,7 +50,7 @@ export default function RedefinirSenha() {
 
   if (etapa === 'email') {
     return (
-      <div style={{
+      <div className="auth-page" style={{
         minHeight: '100vh',
         backgroundColor: '#0D1B6E',
         display: 'flex',
@@ -135,7 +135,7 @@ export default function RedefinirSenha() {
   }
 
   return (
-    <div style={{
+    <div className="auth-page" style={{
       minHeight: '100vh',
       backgroundColor: '#0D1B6E',
       display: 'flex',

@@ -15,6 +15,20 @@ export default function Votacao() {
   const [carregando, setCarregando] = useState(false)
   const [carregandoEleicao, setCarregandoEleicao] = useState(true)
 
+  useEffect(() => {
+    const carregarEleicao = async () => {
+      try {
+        const data = await eleicaoService.buscar(Number(eleicaoId))
+        setEleicao(data)
+      } catch (err: any) {
+        setErro(err.response?.data?.detail || 'Erro ao consultar a eleição')
+      } finally {
+        setCarregandoEleicao(false)
+      }
+    }
+    carregarEleicao()
+  }, [eleicaoId])
+
   const handleNumero = async (n: string) => {
     const vazio = numero.findIndex(d => d === '')
     if (vazio === -1) return
@@ -104,7 +118,7 @@ export default function Votacao() {
           alignItems: 'center',
           justifyContent: 'center',
           padding: '40px 30px',
-          gap: '20px'
+          gap: '24px'
         }}>
           <div style={{
             width: '100px', height: '100px', borderRadius: '50%',
@@ -117,7 +131,6 @@ export default function Votacao() {
           <h2 style={{ color: '#4CAF50', fontSize: '28px', fontWeight: '700', textAlign: 'center' }}>
             Voto Confirmado!
           </h2>
-          <div style={{ flex: 1 }} />
           <button
             onClick={() => navigate('/home')}
             style={{
@@ -130,7 +143,8 @@ export default function Votacao() {
               fontSize: '18px',
               fontWeight: '600',
               cursor: 'pointer',
-              fontFamily: 'Poppins, sans-serif'
+              fontFamily: 'Poppins, sans-serif',
+              marginTop: '16px'
             }}
           >
             Voltar
@@ -139,21 +153,6 @@ export default function Votacao() {
       </div>
     )
   }
-
-  useEffect(() => {
-    const carregarEleicao = async () => {
-      try {
-        const data = await eleicaoService.buscar(Number(eleicaoId))
-        setEleicao(data)
-      } catch (err: any) {
-        setErro(err.response?.data?.detail || 'Erro ao consultar a eleição')
-      } finally {
-        setCarregandoEleicao(false)
-      }
-    }
-
-    carregarEleicao()
-  }, [eleicaoId])
 
   if (carregandoEleicao) {
     return (
@@ -194,7 +193,8 @@ export default function Votacao() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#0D1B6E', display: 'flex', flexDirection: 'column' }}>
+    <div className="votacao-shell">
+    <div className="votacao-card" style={{ backgroundColor: '#0D1B6E', display: 'flex', flexDirection: 'column' }}>
 
       {/* Header */}
       <div style={{ padding: '16px 24px', textAlign: 'center' }}>
@@ -446,6 +446,7 @@ export default function Votacao() {
           </div>
         </div>
       )}
+    </div>
     </div>
   )
 }

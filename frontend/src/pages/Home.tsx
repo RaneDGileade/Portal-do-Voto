@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { eleicaoService } from '../services/api'
+import Sidebar from '../components/Sidebar'
 import type { Eleicao, Usuario } from '../types'
 
 export default function Home() {
@@ -8,6 +9,7 @@ export default function Home() {
   const [eleicaoSelecionada, setEleicaoSelecionada] = useState<Eleicao | null>(null)
   const [carregando, setCarregando] = useState(true)
   const [erroEleicao, setErroEleicao] = useState('')
+  const [sidebarAberta, setSidebarAberta] = useState(false)
   const usuario: Usuario = JSON.parse(localStorage.getItem('usuario') || '{}')
 
   useEffect(() => {
@@ -19,105 +21,91 @@ export default function Home() {
           setEleicaoSelecionada(eleicao)
           return
         }
-
         const eleicoesAtivas = await eleicaoService.listarAtivas()
         if (eleicoesAtivas.length > 0) {
           setEleicaoSelecionada(eleicoesAtivas[0])
           return
         }
-
-        setErroEleicao('Nenhuma eleição ativa encontrada. Verifique o nome da eleição no login.')
-      } catch (err) {
-        console.error(err)
-        setErroEleicao('Erro ao carregar a eleição. Faça login novamente informando o nome correto.')
+        setErroEleicao('Nenhuma eleição ativa encontrada.')
+      } catch {
+        setErroEleicao('Erro ao carregar a eleição. Faça login novamente.')
       } finally {
         setCarregando(false)
       }
     }
-
     carregarEleicao()
   }, [])
-
-  const handleSair = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('usuario')
-    navigate('/login')
-  }
 
   const menus = [
     { label: 'Votar', cor: '#E8A020', rota: eleicaoSelecionada ? `/votacao/${eleicaoSelecionada.id}` : '#', disabled: !eleicaoSelecionada || eleicaoSelecionada.status !== 'ativa' },
     { label: 'Ver candidatos', cor: '#3A8C3F', rota: eleicaoSelecionada ? `/candidatos/${eleicaoSelecionada.id}` : '#', disabled: !eleicaoSelecionada },
     { label: 'Ver resultados', cor: '#2B6CB0', rota: eleicaoSelecionada ? `/resultados/${eleicaoSelecionada.id}` : '#', disabled: !eleicaoSelecionada },
+    { label: 'Eleições participadas', cor: '#9B5BA5', rota: '/participadas', disabled: false },
   ]
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#0D1B6E', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ padding: '20px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1 style={{ color: 'white', fontSize: '24px', fontWeight: '900' }}>
-          Portal do <span style={{ color: '#FF3D00' }}>Voto</span>
-        </h1>
-        <button onClick={handleSair} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'white', fontSize: '22px' }}>
-          ⎋
+    <div className="page-shell">
+      <div className="page-header">
+        <h1>Portal do <span>Voto</span></h1>
+        <button
+          onClick={() => setSidebarAberta(true)}
+          className="profile-toggle"
+          style={{
+            width: '38px', height: '38px', borderRadius: '50%',
+            backgroundColor: '#2B6CB0', color: 'white', border: 'none',
+            cursor: 'pointer', fontSize: '16px', fontWeight: '700',
+            fontFamily: 'Poppins, sans-serif',
+            display: 'flex', alignItems: 'center', justifyContent: 'center'
+          }}
+        >
+          {usuario.nome?.charAt(0).toUpperCase() || '?'}
         </button>
       </div>
 
-      <div style={{ flex: 1, backgroundColor: '#F0F2F5', borderRadius: '20px 20px 0 0', padding: '30px 20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <p style={{ color: '#333', fontSize: '16px', marginBottom: '10px' }}>
+      <div className="page-card">
+        <p style={{ color: '#333', fontSize: '16px' }}>
           Olá, <strong>{usuario.nome}</strong>! Selecione uma opção:
         </p>
 
         {carregando ? (
-          <p style={{ color: '#666', fontSize: '16px' }}>Carregando eleição selecionada...</p>
+          <p style={{ color: '#666', fontSize: '15px' }}>Carregando eleição...</p>
         ) : erroEleicao ? (
-          <div style={{ backgroundColor: '#F8D7DA', color: '#842029', padding: '16px', borderRadius: '12px' }}>
+          <div className="alert-box error">
             <strong>Eleição não localizada.</strong>
-            <p style={{ margin: '8px 0 0', fontSize: '14px' }}>{erroEleicao}</p>
+            <p style={{ margin: '6px 0 0', fontSize: '13px' }}>{erroEleicao}</p>
           </div>
         ) : eleicaoSelecionada ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <div style={{ padding: '16px', borderRadius: '16px', backgroundColor: '#E2E8F0' }}>
-              <p style={{ margin: 0, color: '#1A202C', fontSize: '14px' }}>Eleição selecionada</p>
-              <h2 style={{ margin: '8px 0 0', color: '#2D3748', fontSize: '20px' }}>{eleicaoSelecionada.titulo}</h2>
-              <p style={{ margin: '8px 0 0', color: '#4A5568', fontSize: '14px' }}>
-                Status: <strong>{eleicaoSelecionada.status === 'ativa' ? 'Ativa' : eleicaoSelecionada.status === 'encerrada' ? 'Encerrada' : 'Rascunho'}</strong>
-              </p>
-              {eleicaoSelecionada.status !== 'ativa' && (
-                <p style={{ margin: '6px 0 0', color: '#718096', fontSize: '13px' }}>
-                  Esta eleição não está ativa. Você ainda pode consultar candidatos e resultados.
-                </p>
-              )}
-            </div>
+          <div style={{ padding: '16px', borderRadius: '16px', backgroundColor: '#E2E8F0' }}>
+            <p style={{ margin: 0, color: '#1A202C', fontSize: '13px' }}>Eleição selecionada</p>
+            <h2 style={{ margin: '6px 0 0', color: '#2D3748', fontSize: '18px' }}>{eleicaoSelecionada.titulo}</h2>
+            <p style={{ margin: '6px 0 0', color: '#4A5568', fontSize: '13px' }}>
+              Status: <strong>{eleicaoSelecionada.status === 'ativa' ? 'Ativa' : eleicaoSelecionada.status === 'encerrada' ? 'Encerrada' : 'Rascunho'}</strong>
+            </p>
           </div>
-        ) : (
-          <div style={{ backgroundColor: '#FEF3C7', color: '#92400E', padding: '18px', borderRadius: '14px' }}>
-            <p style={{ margin: 0 }}>Nenhuma eleição encontrada. Faça login novamente informando o nome correto da eleição.</p>
-          </div>
-        )}
+        ) : null}
 
+        <div className="home-menu-grid">
         {menus.map((menu, i) => (
           <button
             key={i}
-            onClick={() => menu.disabled ? undefined : navigate(menu.rota)}
+            onClick={() => !menu.disabled && navigate(menu.rota)}
             disabled={menu.disabled}
+            className="button-primary button-block"
             style={{
-              width: '100%',
-              padding: '30px 24px',
-              backgroundColor: menu.cor,
-              color: '#000',
-              border: 'none',
-              borderRadius: '16px',
-              fontSize: '20px',
-              fontWeight: '800',
-              cursor: menu.disabled ? 'not-allowed' : 'pointer',
-              textAlign: 'left',
-              opacity: menu.disabled ? 0.55 : 1,
-              transition: 'opacity 0.2s'
+              backgroundColor: menu.cor, color: '#000',
+              textAlign: 'left', padding: '28px 24px',
+              fontSize: '20px', fontWeight: 800, borderRadius: '18px',
+              opacity: menu.disabled ? 0.5 : 1,
+              cursor: menu.disabled ? 'not-allowed' : 'pointer'
             }}
           >
             {menu.label}
           </button>
         ))}
+        </div>
       </div>
+
+      <Sidebar isOpen={sidebarAberta} onClose={() => setSidebarAberta(false)} />
     </div>
   )
 }

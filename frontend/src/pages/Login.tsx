@@ -6,6 +6,7 @@ export default function Login() {
   const navigate = useNavigate()
   const [tipo, setTipo] = useState<'admin' | 'usuario'>('usuario')
   const [form, setForm] = useState({ nome: '', senha: '', nomeEleicao: '' })
+  const [usarNomeEleicao, setUsarNomeEleicao] = useState(false)
   const [animCounter, setAnimCounter] = useState(0)
   const [erro, setErro] = useState('')
   const [carregando, setCarregando] = useState(false)
@@ -16,14 +17,13 @@ export default function Login() {
     setErro('')
     setCarregando(true)
     try {
-      if (tipo === 'usuario' && form.nomeEleicao.trim()) {
+      if (tipo === 'usuario' && usarNomeEleicao && form.nomeEleicao.trim()) {
         const eleicoes = await eleicaoService.buscarPorTitulo(form.nomeEleicao.trim())
         if (!eleicoes || eleicoes.length === 0) {
           setErro('Eleição não encontrada')
           setCarregando(false)
           return
         }
-
         const eleicaoSelecionada = eleicoes[0]
         localStorage.setItem('eleicaoSelecionada', String(eleicaoSelecionada.id))
         localStorage.setItem('eleicaoSelecionadaTitulo', eleicaoSelecionada.titulo)
@@ -32,9 +32,13 @@ export default function Login() {
         localStorage.removeItem('eleicaoSelecionadaTitulo')
       }
 
-      // Mapeia 'usuario' para 'eleitor' conforme banco de dados
       const tipoLogin = tipo === 'usuario' ? 'eleitor' : 'admin'
-      const data = await authService.login({ nome: form.nome, senha: form.senha, tipo: tipoLogin })
+      const data = await authService.login({
+        nome: form.nome,
+        senha: form.senha,
+        tipo: tipoLogin,
+        nomeEleicao: usarNomeEleicao ? form.nomeEleicao : undefined
+      })
       localStorage.setItem('token', data.access_token)
       localStorage.setItem('usuario', JSON.stringify(data.usuario))
       if (data.usuario.tipo === 'admin') {
@@ -50,25 +54,22 @@ export default function Login() {
   }
 
   useEffect(() => {
-    // increment counter to force remount of dynamic input wrapper and replay animation
     setAnimCounter(c => c + 1)
+    setUsarNomeEleicao(false)
+    setForm(f => ({ ...f, nomeEleicao: '' }))
   }, [tipo])
 
   useEffect(() => {
     const root = formRef.current
     if (!root) return
     const nodes = Array.from(root.querySelectorAll<HTMLElement>('.slide-in'))
-    if (nodes.length === 0) return
-
-    // remove animation inline style to force restart, then reflow and restore
     nodes.forEach(n => { n.style.animation = 'none' })
-    // force reflow
     void root.offsetHeight
     nodes.forEach(n => { n.style.animation = '' })
   }, [animCounter])
 
   return (
-    <div style={{
+    <div className="auth-page" style={{
       minHeight: '100vh',
       backgroundColor: '#0D1B6E',
       display: 'flex',
@@ -83,7 +84,6 @@ export default function Login() {
         Login
       </h2>
 
-      {/* Radio buttons */}
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '25px', marginBottom: '35px' }}>
         <label className="radio-label">
           <input type="radio" name="tipo" checked={tipo === 'admin'} onChange={() => setTipo('admin')} />
@@ -97,7 +97,7 @@ export default function Login() {
 
       <form ref={formRef} onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
 
-        {/* Campo Nome */}
+        {/* Nome */}
         <div className="slide-in delay-0" key={tipo}>
           <label style={{ color: 'white', fontSize: '16px', display: 'block', marginBottom: '8px' }}>
             nome
@@ -112,26 +112,42 @@ export default function Login() {
         </div>
 
         {/* Campo dinâmico por tipo */}
-        {tipo === 'admin' ? (
+        {tipo === 'usuario' ? (
           <div className="slide-in delay-1" key={`dynamic-${tipo}-${animCounter}`}>
-            <label style={{ color: 'white', fontSize: '16px', display: 'block', marginBottom: '8px' }}>
-              nome da instituição
-            </label>
-            <input className="input-field" type="text" />
-          </div>
-        ) : (
-          <div className="slide-in delay-1" key={`dynamic-${tipo}-${animCounter}`}>
-            <label style={{ color: 'white', fontSize: '16px', display: 'block', marginBottom: '8px' }}>
-              nome da eleição (opcional)
-            </label>
+            {/* Checkbox + label */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+              <input
+                type="checkbox"
+                id="usar-eleicao"
+                checked={usarNomeEleicao}
+                onChange={e => {
+                  setUsarNomeEleicao(e.target.checked)
+                  if (!e.target.checked) setForm(f => ({ ...f, nomeEleicao: '' }))
+                }}
+                style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: '#FF3D00' }}
+              />
+              <label
+                htmlFor="usar-eleicao"
+                style={{ color: 'white', fontSize: '16px', cursor: 'pointer', userSelect: 'none' }}
+              >
+                nome da eleição
+              </label>
+            </div>
             <input
               className="input-field"
               type="text"
+              placeholder="Digite o nome da eleição..."
+              disabled={!usarNomeEleicao}
               value={form.nomeEleicao}
               onChange={e => setForm({ ...form, nomeEleicao: e.target.value })}
+              style={{
+                opacity: usarNomeEleicao ? 1 : 0.35,
+                cursor: usarNomeEleicao ? 'text' : 'not-allowed',
+                transition: 'opacity 0.2s'
+              }}
             />
           </div>
-        )}
+        ) : null}
 
         {/* Senha */}
         <div className="slide-in delay-2" key="senha-field">
@@ -147,7 +163,6 @@ export default function Login() {
           />
         </div>
 
-        {/* Esqueceu senha */}
         <div style={{ textAlign: 'right', marginTop: '-10px' }}>
           <Link to="/redefinir-senha" style={{ color: 'white', fontSize: '14px', textDecoration: 'none' }}>
             esqueceu a senha?

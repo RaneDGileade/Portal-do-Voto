@@ -45,14 +45,14 @@ def get_usuario_atual(
     )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        matricula: str = payload.get("sub")
-        if matricula is None:
+        email_sub: str = payload.get("sub")
+        if email_sub is None:
             raise erro
     except JWTError:
         raise erro
 
     usuario = db.query(models.Usuario).filter(
-        models.Usuario.matricula == matricula
+        models.Usuario.email == email_sub
     ).first()
 
     if usuario is None:

@@ -65,6 +65,23 @@ def registrar_voto(
     return voto
 
 
+@router.get("/participadas", response_model=list[schemas.Eleicao])
+def listar_participadas(
+    db: Session = Depends(get_db),
+    usuario=Depends(get_usuario_atual)
+):
+    eleicoes = (
+        db.query(models.Eleicao)
+        .join(models.Voto, models.Voto.eleicao_id == models.Eleicao.id)
+        .filter(
+            models.Voto.usuario_id == usuario.id,
+            models.Eleicao.status == "encerrada"
+        )
+        .all()
+    )
+    return eleicoes
+
+
 @router.get("/meu-voto/{eleicao_id}")
 def verificar_meu_voto(
     eleicao_id: int,

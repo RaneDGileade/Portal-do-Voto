@@ -1,25 +1,17 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { adminService } from '../../services/api'
+import Sidebar from '../../components/Sidebar'
 
 export default function Dashboard() {
   const navigate = useNavigate()
-  const [painel, setPainel] = useState({
-    total_chapas: 0,
-    total_eleitores: 0,
-    eleicoes_ativas: 0,
-    eleicoes_encerradas: 0
-  })
+  const [painel, setPainel] = useState({ total_chapas: 0, total_eleitores: 0, eleicoes_ativas: 0, eleicoes_encerradas: 0 })
+  const [sidebarAberta, setSidebarAberta] = useState(false)
+  const usuario = JSON.parse(localStorage.getItem('usuario') || '{}')
 
   useEffect(() => {
     adminService.painel().then(setPainel).catch(console.error)
   }, [])
-
-  const handleSair = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('usuario')
-    navigate('/login')
-  }
 
   const menus = [
     { label: 'Cadastrar chapas e candidatos', cor: '#E8A020', rota: '/admin/chapas' },
@@ -31,11 +23,19 @@ export default function Dashboard() {
   return (
     <div className="page-shell">
       <div className="page-header">
-        <h1>
-          Portal do <span>Voto</span>
-        </h1>
-        <button onClick={handleSair} className="button-tertiary" style={{ fontSize: '22px' }}>
-          ⎋
+        <h1>Portal do <span>Voto</span></h1>
+        <button
+          onClick={() => setSidebarAberta(true)}
+          className="profile-toggle"
+          style={{
+            width: '38px', height: '38px', borderRadius: '50%',
+            backgroundColor: '#FF3D00', color: 'white', border: 'none',
+            cursor: 'pointer', fontSize: '16px', fontWeight: '700',
+            fontFamily: 'Poppins, sans-serif',
+            display: 'flex', alignItems: 'center', justifyContent: 'center'
+          }}
+        >
+          {usuario.nome?.charAt(0).toUpperCase() || '?'}
         </button>
       </div>
 
@@ -47,13 +47,10 @@ export default function Dashboard() {
               onClick={() => navigate(menu.rota)}
               className="button-primary button-block"
               style={{
-                backgroundColor: menu.cor,
-                color: '#000',
-                textAlign: 'left',
-                padding: '28px 24px',
-                fontSize: '20px',
-                fontWeight: 800,
-                borderRadius: '18px'
+                backgroundColor: menu.cor, color: '#000',
+                textAlign: 'left', padding: '28px 24px',
+                fontSize: '20px', fontWeight: 800, borderRadius: '18px',
+                marginBottom: '14px'
               }}
             >
               {menu.label}
@@ -75,6 +72,8 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      <Sidebar isOpen={sidebarAberta} onClose={() => setSidebarAberta(false)} />
     </div>
   )
 }

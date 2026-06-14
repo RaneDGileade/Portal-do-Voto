@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { adminService } from '../../services/api'
+import Sidebar from '../../components/Sidebar'
 
 interface ChapaResultado {
   chapa_id: number
@@ -22,6 +23,8 @@ export default function ResultadosAdmin() {
   const navigate = useNavigate()
   const [resultados, setResultados] = useState<EleicaoResultado[]>([])
   const [carregando, setCarregando] = useState(true)
+  const [sidebarAberta, setSidebarAberta] = useState(false)
+  const usuario = JSON.parse(localStorage.getItem('usuario') || '{}')
 
   useEffect(() => {
     carregarResultados()
@@ -46,9 +49,11 @@ export default function ResultadosAdmin() {
 
   return (
     <div className="page-shell">
-      {/* Header */}
       <div className="page-header">
         <h1>Portal Do <span>Voto</span></h1>
+        <button onClick={() => setSidebarAberta(true)} className="profile-toggle" style={{ width: '38px', height: '38px', borderRadius: '50%', backgroundColor: '#FF3D00', color: 'white', border: 'none', cursor: 'pointer', fontSize: '16px', fontWeight: '700', fontFamily: 'Poppins, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {usuario.nome?.charAt(0).toUpperCase() || '?'}
+        </button>
       </div>
 
       <div className="page-card">
@@ -132,6 +137,8 @@ export default function ResultadosAdmin() {
           </button>
         </div>
       </div>
+
+      <Sidebar isOpen={sidebarAberta} onClose={() => setSidebarAberta(false)} />
     </div>
   )
 }

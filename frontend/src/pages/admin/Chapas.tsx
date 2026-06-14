@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { chapaService, eleicaoService } from '../../services/api'
+import Sidebar from '../../components/Sidebar'
 import { Chapa, Eleicao } from '../../types'
 
 export default function Chapas() {
@@ -18,6 +19,8 @@ export default function Chapas() {
   const [erro, setErro] = useState('')
   const [sucesso, setSucesso] = useState('')
   const [carregando, setCarregando] = useState(false)
+  const [sidebarAberta, setSidebarAberta] = useState(false)
+  const usuario = JSON.parse(localStorage.getItem('usuario') || '{}')
 
   useEffect(() => {
     carregarDados()
@@ -84,12 +87,16 @@ export default function Chapas() {
     <div className="page-shell">
       <div className="page-header">
         <h1>Portal Do <span>Voto</span></h1>
+        <button onClick={() => setSidebarAberta(true)} className="profile-toggle" style={{ width: '38px', height: '38px', borderRadius: '50%', backgroundColor: '#FF3D00', color: 'white', border: 'none', cursor: 'pointer', fontSize: '16px', fontWeight: '700', fontFamily: 'Poppins, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {usuario.nome?.charAt(0).toUpperCase() || '?'}
+        </button>
       </div>
 
       <div className="page-card">
         <div className="page-card-center">
           <h2 className="page-title">{editando ? 'Editar chapa' : 'Cadastro de chapas'}</h2>
 
+          <div className="desktop-two-col">
           <form onSubmit={handleSubmit} className="card" style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
             <div className="form-group">
               <label className="form-label" style={{ color: '#0F172A' }}>Eleição</label>
@@ -217,8 +224,10 @@ export default function Chapas() {
               ))
             )}
           </div>
+          </div>{/* desktop-two-col */}
         </div>
       </div>
+      <Sidebar isOpen={sidebarAberta} onClose={() => setSidebarAberta(false)} />
     </div>
   )
 }
