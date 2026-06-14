@@ -29,7 +29,12 @@ export default function Cadastro() {
       await authService.cadastro({ nome: form.nome, email: form.email, senha: form.senha, confirmar_senha: form.confirmar_senha, tipo })
       navigate('/login')
     } catch (err: any) {
-      setErro(err.response?.data?.detail || 'Erro ao cadastrar')
+      const detail = err.response?.data?.detail
+      if (Array.isArray(detail)) {
+        setErro(detail.map((d: any) => d.msg).join(', '))
+      } else {
+        setErro(detail || 'Erro ao cadastrar. Verifique sua conexão e tente novamente.')
+      }
     } finally {
       setCarregando(false)
     }
